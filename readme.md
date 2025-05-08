@@ -1,9 +1,3 @@
-<h1>THIS IS AN UNOFFICIAL FORK</h1>
-
-This is my fork of FidelityFX that adds in Linux support. Almost all FidelityFX features should work - frame interpolation is the one exception. I did not want to rewrite the swapchain class, sorry. If you really care about that, a PR is welcome. Check out `sdk/src/backends/vk/FrameInterpolationSwapchain` to get started
-
-I'm testing this in my current game and not using all features. It's highly likely I've missed some issues when testing. Please open an Issue with any problems you find
-
 <h1>Welcome to the AMD FidelityFX™ SDK 1.1.4</h1>
 
 ![alt text](/docs/media/fidelityfxsdk-logo-rescaled.png)
@@ -27,7 +21,7 @@ The FidelityFX SDK includes:
 | [Super Resolution Upscaling and Frame Generation](/docs/techniques/super-resolution-interpolation.md) 3.1.4 | [Super Resolution sample](/docs/samples/super-resolution.md) | [FidelityFX Super Resolution 3](https://gpuopen.com/fidelityfx-superresolution-3/) | Offers generation of interpolated frames in combination with our temporal upscaler for producing high resolution frames from lower resolution inputs. |
 | [Super Resolution (Upscaler)](/docs/techniques/super-resolution-upscaler.md) 3.1.4 | [Super Resolution sample](/docs.samples/super-resolution.md) | [FidelityFX Super Resolution 3](https://gpuopen.com/fidelityfx-superresolution-3/) | Offers a temporal (multi-frame accumulation) solution for producing high resolution frames from lower resolution inputs. |
 | [Frame Interpolation](techniques/frame-interpolation.md) 1.1.3 | [Super Resolution sample](/docs/samples/super-resolution.md) | [FidelityFX Super Resolution 3](https://gpuopen.com/fidelityfx-superresolution-3/) | Offers generation of interpolated frames from multiple real input frames, and multiple sources of motion vector data. |
-| [Frame Interpolation SwapChain](/docs/techniques/frame-interpolation-swap-chain.md) 1.1.3 | [Super Resolution sample](/docs/samples/super-resolution.md) | [FidelityFX Super Resolution 3](https://gpuopen.com/fidelityfx-superresolution-3/) | A replacement DXGI Swapchain implementation for DX12 which allows for additional frames to be presented along with real game frames, with relevant frame pacing. NOT SUPPORTED ON LINUX |
+| [Frame Interpolation SwapChain](/docs/techniques/frame-interpolation-swap-chain.md) 1.1.3 | [Super Resolution sample](/docs/samples/super-resolution.md) | [FidelityFX Super Resolution 3](https://gpuopen.com/fidelityfx-superresolution-3/) | A replacement DXGI Swapchain implementation for DX12 which allows for additional frames to be presented along with real game frames, with relevant frame pacing. |
 | [Optical Flow](/docs/techniques/optical-flow.md) 1.1.2 | [Super Resolution sample](/docs/samples/super-resolution.md) | [FidelityFX Super Resolution 3](https://gpuopen.com/fidelityfx-superresolution-3/) | Offers a motion-estimation algorithm which is useful for generating block-based motion vectors from temporal image inputs. |
 | [Variable Shading](/docs/techniques/variable-shading.md) 1.2 | [Variable Shading sample](/docs/samples/variable-shading.md) | [FidelityFX Variable Shading](https://gpuopen.com/fidelityfx-variable-shading/) | Helps you to drive Variable Rate Shading hardware introduced in RDNA2-based and contemporary GPUs, by analyzing the luminance of pixels in a tile to determine where the shading rate can be lowered to increase performance. |
 | [Blur](/docs/samples/blur.md) 1.1 | [Blur sample](/docs/samples/blur.md) | [FidelityFX Blur](https://gpuopen.com/fidelityfx-blur/) | A library of highly optimized functions which perform common blurring operations such as Gaussian blur, radial blurs, and others. |
@@ -73,19 +67,6 @@ The FidelityFX SDK includes:
 | FidelityFX DOF | All APIs / All Configs | Some artifacts may occur on some Intel Arc GPUs. |
 | All FidelityFX SDK Samples | All APIs / All Configs | There is a resource leak in the UploadContext used to load glTF content. |
 | All FidelityFX SDK Samples | All APIs / All Configs | Windows path length restrictions may cause compile issues. It is recommended to place the SDK close to the root of a drive or use subst or a mklink to shorten the path. |
-
-<h2>Linux Notes</h2>
-Linux support has been added by DethRaid (me). I've made the following changes to get this to work:
-<ul>
-<li>>`sdk/toolchain.cmake` does not set the `CMAKE_GENERATOR_PLATFORM` variable if we're building the VK or D3D12 backend on anything except Windows</li>
-<li>>If CMAKE_GENERATOR_PLATFORM is not set, `sdk/CMakeLists.txt` sets `FFX_PLATFORM_NAME` to `x64`</li>
-<li>>I've removed the `_s` functions throughout the code base. While versions of these are available in C11, my system (Manjaro Linux with Clang 20.8.1) does not support them</li>
-<li>>I've changed usage of `_countof` to `std::extent_v<decltype(variable)>` for better cross-platform compatibility</li>
-<li>>I've increased the sizes of many of the context structs to account for the size of the private data (it's bigger for some reason?)</li>
-<li>>I added an include for `math.h` in `ffx_core_cpu.h`</li>
-<li>>Added some explicit casts to `uint32_t`</li>
-<li>>I have made so many changes to the shader compilation. yalls have no idea (i guess you can get an idea by checking the git history). I've added excape characters to the shader permutations to get around bash command expansion, I've fixed up the cmake files so they don't create dummy targets that don't exist and also don't double-add shaders, I've rewritten a lot of the shader compiler program to not be married to windows, like at all. At least half my time on this project has been spent just reworking shader compilation</li>
-</ul>
 
 <h2>Open source</h2>
 

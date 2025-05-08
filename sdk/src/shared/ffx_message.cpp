@@ -21,7 +21,6 @@
 // THE SOFTWARE.
 
 #include <FidelityFX/host/ffx_message.h>
-#include <FidelityFX/host/ffx_util.h>
 
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN

@@ -25,4 +25,4 @@ set(BLUR_API_BASE_ARGS
     -compiler=glslang -e CS --target-env vulkan1.2 -S comp -Os -DFFX_GLSL=1)
 
 # Compile glsl blur shader
-include("${FFX_GPU_PATH}/blur/CmakeCompileBlurShaders.txt")
+include("${FFX_GPU_PATH}/blur/CMakeCompileBlurShaders.txt")

@@ -89,7 +89,8 @@ elseif(CMAKE_GENERATOR_PLATFORM STREQUAL "arm64" OR CMAKE_EXE_LINKER_FLAGS STREQ
 elseif(CMAKE_GENERATOR_PLATFORM STREQUAL "arm64ec" OR CMAKE_EXE_LINKER_FLAGS STREQUAL "/machine:ARM64EC")
 	set(FFX_PLATFORM_NAME arm64ec)
 else()
-    message(FATAL_ERROR "Unsupported target platform \"${CMAKE_GENERATOR_PLATFORM}\"")
+    message(STATUS "Unknown target platform \"${CMAKE_GENERATOR_PLATFORM}\"! Defaulting to x64")
+	set(FFX_PLATFORM_NAME x64)
 endif()
 
 # Pre-compile shaders

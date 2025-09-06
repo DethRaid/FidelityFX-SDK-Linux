@@ -491,7 +491,7 @@ endif()
 
 if (FFX_BLUR OR FFX_ALL)
 	target_compile_definitions(ffx_backend_vk_${FFX_PLATFORM_NAME} PRIVATE FFX_BLUR)
-	include (CMakeShadersBlur.txt)
+	include (CMakeShadersBLUR.txt)
 endif()
 
 if (FFX_VRS OR FFX_ALL)

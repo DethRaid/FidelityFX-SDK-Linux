@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <cwchar>
 #include <string.h>     // for memset
 #include <stdlib.h>     // for _countof
 
@@ -60,12 +61,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavBufferCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavBufferBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(uavBufferBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(uavBufferBindingTable[mapIndex].name, inoutPipeline->uavBufferBindings[uavIndex].name))
                 break;
         }
-        if (mapIndex == _countof(uavBufferBindingTable))
+        if (mapIndex == std::extent<decltype(uavBufferBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavBufferBindings[uavIndex].resourceIdentifier = uavBufferBindingTable[mapIndex].index;
@@ -75,12 +76,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t cbIndex = 0; cbIndex < inoutPipeline->constCount; ++cbIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(cbResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(cbResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(cbResourceBindingTable[mapIndex].name, inoutPipeline->constantBufferBindings[cbIndex].name))
                 break;
         }
-        if (mapIndex == _countof(cbResourceBindingTable))
+        if (mapIndex == std::extent<decltype(cbResourceBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->constantBufferBindings[cbIndex].resourceIdentifier = cbResourceBindingTable[mapIndex].index;
@@ -137,7 +138,7 @@ static FfxErrorCode createPipelineStates(FfxParallelSortContext_Private* context
     // Set up pipeline descriptors (basically RootSignature and binding)
     if (context->contextDescription.flags & FFX_PARALLELSORT_INDIRECT_SORT) 
     {
-        wcscpy_s(pipelineDescription.name, L"PARALLELSORT-SETUPDINDIRECTARGS");
+        wcscmp(pipelineDescription.name, L"PARALLELSORT-SETUPDINDIRECTARGS");
         FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_PARALLEL_SORT, FFX_PARALLELSORT_PASS_SETUP_INDIRECT_ARGS,
             getPipelinePermutationFlags(contextFlags, FFX_PARALLELSORT_PASS_SETUP_INDIRECT_ARGS, supportedFP16, canForceWave64),
             &pipelineDescription, context->effectContextId, &context->pipelineSetupIndirectArgs));
@@ -149,7 +150,7 @@ static FfxErrorCode createPipelineStates(FfxParallelSortContext_Private* context
     {
         // no indirect on this pipeline
         pipelineDescription.indirectWorkload = 0;
-        wcscpy_s(pipelineDescription.name, L"PARALLELSORT-SCAN");
+        wcscmp(pipelineDescription.name,  L"PARALLELSORT-SCAN");
         FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_PARALLEL_SORT, FFX_PARALLELSORT_PASS_SCAN,
             getPipelinePermutationFlags(contextFlags, FFX_PARALLELSORT_PASS_SCAN, supportedFP16, canForceWave64),
             &pipelineDescription, context->effectContextId, &context->pipelineScan[i]));
@@ -159,22 +160,22 @@ static FfxErrorCode createPipelineStates(FfxParallelSortContext_Private* context
             pipelineDescription.indirectWorkload = 1;
         }
 
-        wcscpy_s(pipelineDescription.name, L"PARALLELSORT-SUM");
+        wcscmp(pipelineDescription.name, L"PARALLELSORT-SUM");
         FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_PARALLEL_SORT, FFX_PARALLELSORT_PASS_SUM,
             getPipelinePermutationFlags(contextFlags, FFX_PARALLELSORT_PASS_SUM, supportedFP16, canForceWave64),
             &pipelineDescription, context->effectContextId, &context->pipelineCount[i]));
 
-        wcscpy_s(pipelineDescription.name, L"PARALLELSORT-REDUCE");
+        wcscmp(pipelineDescription.name, L"PARALLELSORT-REDUCE");
         FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_PARALLEL_SORT, FFX_PARALLELSORT_PASS_REDUCE,
             getPipelinePermutationFlags(contextFlags, FFX_PARALLELSORT_PASS_REDUCE, supportedFP16, canForceWave64),
             &pipelineDescription, context->effectContextId, &context->pipelineReduce[i]));
 
-        wcscpy_s(pipelineDescription.name, L"PARALLELSORT-SCAN_ADD");
+        wcscmp(pipelineDescription.name, L"PARALLELSORT-SCAN_ADD");
         FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_PARALLEL_SORT, FFX_PARALLELSORT_PASS_SCAN_ADD,
             getPipelinePermutationFlags(contextFlags, FFX_PARALLELSORT_PASS_SCAN_ADD, supportedFP16, canForceWave64),
             &pipelineDescription, context->effectContextId, &context->pipelineScanAdd[i]));
 
-        wcscpy_s(pipelineDescription.name, L"PARALLELSORT-SCATTER");
+        wcscpy(pipelineDescription.name, L"PARALLELSORT-SCATTER");
         FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_PARALLEL_SORT, FFX_PARALLELSORT_PASS_SCATTER,
             getPipelinePermutationFlags(contextFlags, FFX_PARALLELSORT_PASS_SCATTER, supportedFP16, canForceWave64),
             &pipelineDescription, context->effectContextId, &context->pipelineScatter[i]));
@@ -235,7 +236,7 @@ static FfxErrorCode parallelSortCreate(FfxParallelSortContext_Private* context, 
          FFX_RESOURCE_TYPE_BUFFER,
          FFX_RESOURCE_USAGE_UAV,
          FFX_SURFACE_FORMAT_UNKNOWN,
-         contextDescription->maxEntries * sizeof(uint32_t),
+         static_cast<uint32_t>(contextDescription->maxEntries * sizeof(uint32_t)),
          sizeof(uint32_t),
          1,
          FFX_RESOURCE_FLAGS_NONE,
@@ -246,7 +247,7 @@ static FfxErrorCode parallelSortCreate(FfxParallelSortContext_Private* context, 
          FFX_RESOURCE_TYPE_BUFFER,
          FFX_RESOURCE_USAGE_UAV,
          FFX_SURFACE_FORMAT_UNKNOWN,
-         contextDescription->maxEntries * sizeof(uint32_t),
+         static_cast<uint32_t>(contextDescription->maxEntries * sizeof(uint32_t)),
          sizeof(uint32_t),
          1,
          FFX_RESOURCE_FLAGS_NONE,
@@ -332,7 +333,7 @@ static void scheduleDispatch(FfxParallelSortContext_Private* pContext, const Ffx
                                 const FfxPipelineState* pPipeline, uint32_t dispatchX, uint32_t dispatchY, uint32_t dispatchZ)
 {
     FfxGpuJobDescription dispatchJob = {FFX_GPU_JOB_COMPUTE};
-    wcscpy_s(dispatchJob.jobLabel, pPipeline->name);
+    wcscpy(dispatchJob.jobLabel, pPipeline->name);
 
     // Buffer uavs
     for (uint32_t currentUnorderedAccessViewIndex = 0; currentUnorderedAccessViewIndex < pPipeline->uavBufferCount; ++currentUnorderedAccessViewIndex) {
@@ -342,6 +343,7 @@ static void scheduleDispatch(FfxParallelSortContext_Private* pContext, const Ffx
         dispatchJob.computeJobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
         wcscpy_s(dispatchJob.computeJobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].name,
+                 FFX_RESOURCE_NAME_SIZE,
                  pPipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
 #endif
     }
@@ -352,7 +354,7 @@ static void scheduleDispatch(FfxParallelSortContext_Private* pContext, const Ffx
     dispatchJob.computeJobDescriptor.pipeline      = *pPipeline;
 
 #ifdef FFX_DEBUG
-    wcscpy_s(dispatchJob.computeJobDescriptor.cbNames[0], pPipeline->constantBufferBindings[0].name);
+    wcscpy_s(dispatchJob.computeJobDescriptor.cbNames[0], FFX_RESOURCE_NAME_SIZE, pPipeline->constantBufferBindings[0].name);
 #endif
     dispatchJob.computeJobDescriptor.cbs[0] = pContext->constantBuffer;
 
@@ -372,7 +374,7 @@ static void scheduleIndirectDispatch(FfxParallelSortContext_Private* pContext, c
         const FfxResourceInternal currentResource = pContext->uavResources[currentResourceId];
         jobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].name, pPipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy_s(jobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].name, FFX_RESOURCE_NAME_SIZE, pPipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
 #endif
     }
 
@@ -382,12 +384,12 @@ static void scheduleIndirectDispatch(FfxParallelSortContext_Private* pContext, c
 
     // Copy constants
 #ifdef FFX_DEBUG
-    wcscpy_s(jobDescriptor.cbNames[0], pPipeline->constantBufferBindings[0].name);
+    wcscpy_s(jobDescriptor.cbNames[0], FFX_RESOURCE_NAME_SIZE, pPipeline->constantBufferBindings[0].name);
 #endif
     jobDescriptor.cbs[0] = pContext->constantBuffer;
 
     FfxGpuJobDescription dispatchJob = { FFX_GPU_JOB_COMPUTE };
-    wcscpy_s(dispatchJob.jobLabel, pPipeline->name);
+    wcscpy(dispatchJob.jobLabel, pPipeline->name);
     dispatchJob.computeJobDescriptor = jobDescriptor;
 
     pContext->contextDescription.backendInterface.fpScheduleGpuJob(&pContext->contextDescription.backendInterface, &dispatchJob);

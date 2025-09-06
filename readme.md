@@ -68,6 +68,14 @@ The FidelityFX SDK includes:
 | All FidelityFX SDK Samples | All APIs / All Configs | There is a resource leak in the UploadContext used to load glTF content. |
 | All FidelityFX SDK Samples | All APIs / All Configs | Windows path length restrictions may cause compile issues. It is recommended to place the SDK close to the root of a drive or use subst or a mklink to shorten the path. |
 
+<h2>Linux Notes</h2>
+Linux support has been added by DethRaid (me). I've made the following changes to get this to work:
+- `sdk/toolchain.cmake` does not set the `CMAKE_GENERATOR_PLATFORM` variable if we're building the VK or D3D12 backend on anything except Windows
+- If CMAKE_GENERATOR_PLATFORM is not set, `sdk/CMakeLists.txt` sets `FFX_PLATFORM_NAME` to `x64`
+- I've removed the `_s` functions throughout the code base. While versions of these are available in C11, my system (Manjaro Linux with Clang 20.8.1) does not support them
+- I've changed usage of `_countof` to `std::extent<decltype(variable)>::value` for better cross-platform compatibility
+- I've changed `FFX_PARALLELSORT_CONTEXT_SIZE` to account for the size of the private data (it's bigger for some reason?)
+
 <h2>Open source</h2>
 
 AMD FidelityFX SDK is open source, and available under the MIT license.

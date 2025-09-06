@@ -475,7 +475,7 @@ static void scheduleDispatch(FfxBlurContext_Private* context,
                              uint32_t                dispatchZ)
 {
     FfxGpuJobDescription dispatchJob = {FFX_GPU_JOB_COMPUTE};
-    wcscpy  (dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
 
     for (uint32_t currentShaderResourceViewIndex = 0; currentShaderResourceViewIndex < pipeline->srvTextureCount; ++currentShaderResourceViewIndex)
     {

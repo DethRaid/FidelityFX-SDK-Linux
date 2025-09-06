@@ -57,7 +57,7 @@
 /// The size of the raw context specified in 32bit values.
 ///
 /// @ingroup ffxBrixelizer
-#define FFX_BRIXELIZER_RAW_CONTEXT_SIZE (2924058)
+#define FFX_BRIXELIZER_RAW_CONTEXT_SIZE (12728424 / 4)
 
 #ifdef __cplusplus
 extern "C" {

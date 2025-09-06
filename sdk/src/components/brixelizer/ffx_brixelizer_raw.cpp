@@ -27,6 +27,7 @@
 #include <cfloat>     // for FLT_EPSILON.
 
 #define FFX_CPU
+#include <cwchar>
 #include <FidelityFX/gpu/ffx_core.h>
 #include <FidelityFX/gpu/brixelizer/ffx_brixelizer_host_gpu_shared_private.h>
 #include <FidelityFX/host/ffx_brixelizer_raw.h>
@@ -189,12 +190,12 @@ static void patchResourceBindings(FfxPipelineState* inoutPipeline)
         FfxResourceBinding& binding = inoutPipeline->srvTextureBindings[srvTextureIndex];
 
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(srvResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(srvResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(srvResourceBindingTable[mapIndex].name, binding.name))
                 break;
         }
-        if (mapIndex == _countof(srvResourceBindingTable))
+        if (mapIndex == std::extent<decltype(srvResourceBindingTable)>::value)
             return;
 
         binding.resourceIdentifier = srvResourceBindingTable[mapIndex].index + binding.arrayIndex;
@@ -205,12 +206,12 @@ static void patchResourceBindings(FfxPipelineState* inoutPipeline)
         FfxResourceBinding& binding = inoutPipeline->srvBufferBindings[srvBufferIndex];
 
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(srvResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(srvResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(srvResourceBindingTable[mapIndex].name, binding.name))
                 break;
         }
-        if (mapIndex == _countof(srvResourceBindingTable))
+        if (mapIndex == std::extent<decltype(srvResourceBindingTable)>::value)
             return;
 
         binding.resourceIdentifier = srvResourceBindingTable[mapIndex].index + binding.arrayIndex;
@@ -219,12 +220,12 @@ static void patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavTextureIndex = 0; uavTextureIndex < inoutPipeline->uavTextureCount; ++uavTextureIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(uavResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(uavResourceBindingTable[mapIndex].name, inoutPipeline->uavTextureBindings[uavTextureIndex].name))
                 break;
         }
-        if (mapIndex == _countof(uavResourceBindingTable))
+        if (mapIndex == std::extent<decltype(uavResourceBindingTable)>::value)
             return;
 
         inoutPipeline->uavTextureBindings[uavTextureIndex].resourceIdentifier = uavResourceBindingTable[mapIndex].index;
@@ -235,12 +236,12 @@ static void patchResourceBindings(FfxPipelineState* inoutPipeline)
         FfxResourceBinding& binding = inoutPipeline->uavBufferBindings[uavBufferIndex];
 
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(uavResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(uavResourceBindingTable[mapIndex].name, binding.name))
                 break;
         }
-        if (mapIndex == _countof(uavResourceBindingTable))
+        if (mapIndex == std::extent<decltype(uavResourceBindingTable)>::value)
             return;
 
         binding.resourceIdentifier = uavResourceBindingTable[mapIndex].index + binding.arrayIndex;
@@ -251,12 +252,12 @@ static void patchResourceBindings(FfxPipelineState* inoutPipeline)
         FfxResourceBinding& binding = inoutPipeline->constantBufferBindings[cbvIndex];
 
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(cbvResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(cbvResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(cbvResourceBindingTable[mapIndex].name, binding.name))
                 break;
         }
-        if (mapIndex == _countof(cbvResourceBindingTable))
+        if (mapIndex == std::extent<decltype(cbvResourceBindingTable)>::value)
             return;
 
         binding.resourceIdentifier = cbvResourceBindingTable[mapIndex].index;
@@ -308,7 +309,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
     memset(&pipelineDescription, 0, sizeof(FfxPipelineDescription));
 
     // Set up pipeline descriptor (basically RootSignature and binding)
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_MARK_UNINITIALIZED");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_MARK_UNINITIALIZED");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_MARK_UNINITIALIZED,
@@ -316,7 +317,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeMarkCascadeUninitialized));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_CLEAR_COUNTERS");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_CLEAR_COUNTERS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CONTEXT_CLEAR_COUNTERS,
@@ -324,7 +325,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineContextClearCounters));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_COLLECT_CLEAR_BRICKS");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_COLLECT_CLEAR_BRICKS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CONTEXT_COLLECT_CLEAR_BRICKS,
@@ -332,7 +333,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineContextCollectClearBricks));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_PREPARE_CLEAR_BRICKS");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_PREPARE_CLEAR_BRICKS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CONTEXT_PREPARE_CLEAR_BRICKS,
@@ -340,7 +341,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineContextPrepareClearBricks));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_COLLECT_DIRTY_BRICKS");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_COLLECT_DIRTY_BRICKS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CONTEXT_COLLECT_DIRTY_BRICKS,
@@ -348,7 +349,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineContextCollectDirtyBricks));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_PREPARE_EIKONAL_ARGS");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_PREPARE_EIKONAL_ARGS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CONTEXT_PREPARE_EIKONAL_ARGS,
@@ -356,7 +357,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineContextPrepareEikonalArgs));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_MERGE_CASCADES");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_MERGE_CASCADES");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CONTEXT_MERGE_CASCADES,
@@ -364,7 +365,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineContextMergeCascades));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_PREPARE_MERGE_BRICKS_ARGS");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_PREPARE_MERGE_BRICKS_ARGS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CONTEXT_PREPARE_MERGE_BRICKS_ARGS,
@@ -372,7 +373,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineContextPrepareMergeBricksArgs));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_CLEAR_BUILD_COUNTERS");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_CLEAR_BUILD_COUNTERS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_CLEAR_BUILD_COUNTERS,
@@ -380,7 +381,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeClearBuildCounters));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_RESET_CASCADE");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_RESET_CASCADE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_RESET_CASCADE,
@@ -388,7 +389,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeResetCascade));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_SCROLL_CASCADE");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_SCROLL_CASCADE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_SCROLL_CASCADE,
@@ -396,7 +397,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeScrollCascade));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_CLEAR_REF_COUNTERS");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_CLEAR_REF_COUNTERS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_CLEAR_REF_COUNTERS,
@@ -404,7 +405,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeClearRefCounters));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_CLEAR_JOB_COUNTER");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_CLEAR_JOB_COUNTER");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_CLEAR_JOB_COUNTER,
@@ -412,7 +413,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeClearJobCounter));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_INVALIDATE_JOB_AREAS");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_INVALIDATE_JOB_AREAS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_INVALIDATE_JOB_AREAS,
@@ -420,7 +421,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeInvalidateJobAreas));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_COARSE_CULLING");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_COARSE_CULLING");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_COARSE_CULLING,
@@ -428,7 +429,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeCoarseCulling));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_SCAN_JOBS");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_SCAN_JOBS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_SCAN_JOBS,
@@ -436,7 +437,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeScanJobs));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_SCAN_REFERENCES");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_SCAN_REFERENCES");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_SCAN_REFERENCES,
@@ -444,7 +445,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeScanReferences));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_INITIALIZE_CASCADE");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_INITIALIZE_CASCADE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_INITIALIZE_CASCADE,
@@ -452,7 +453,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeInitializeCascade));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_BUILD_TREE_AABB");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_BUILD_TREE_AABB");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_BUILD_TREE_AABB,
@@ -460,7 +461,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeBuildTreeAABB));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_FREE_CASCADE");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_FREE_CASCADE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_FREE_CASCADE,
@@ -470,7 +471,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &context->pipelineCascadeFreeCascade));
     pipelineDescription.samplerCount = samplerCount;
     pipelineDescription.samplers     = samplers;
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_DEBUG_VISUALIZATION");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_DEBUG_VISUALIZATION");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_DEBUG_VISUALIZATION,
@@ -478,7 +479,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineDebugVisualization));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_DEBUG_INSTANCE_AABBS");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_DEBUG_INSTANCE_AABBS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_DEBUG_INSTANCE_AABBS,
@@ -486,7 +487,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineDebugInstanceAABBs));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_DEBUG_DRAW_AABB_TREE");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_DEBUG_DRAW_AABB_TREE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_DEBUG_AABB_TREE,
@@ -495,7 +496,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                context->effectContextId,
                                                                                &context->pipelineDebugDrawAABBTree));
     pipelineDescription.indirectWorkload = 1;
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_CLEAR_BRICK");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_CLEAR_BRICK");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CONTEXT_CLEAR_BRICK,
@@ -503,7 +504,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineContextClearBrick));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_EIKONAL");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_EIKONAL");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CONTEXT_EIKONAL,
@@ -511,7 +512,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineContextEikonal));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_VOXELIZE");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_VOXELIZE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_VOXELIZE,
@@ -519,7 +520,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeVoxelize));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_COMPACT_REFERENCES");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_COMPACT_REFERENCES");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_COMPACT_REFERENCES,
@@ -527,7 +528,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeCompactReferences));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_CLEAR_BRICK_STORAGE");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_CLEAR_BRICK_STORAGE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_CLEAR_BRICK_STORAGE,
@@ -535,7 +536,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeClearBrickStorage));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_EMIT_SDF");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_EMIT_SDF");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_EMIT_SDF,
@@ -543,7 +544,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeEmitSDF));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_COMPRESS_BRICK");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CASCADE_COMPRESS_BRICK");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CASCADE_COMPRESS_BRICK,
@@ -551,7 +552,7 @@ static FfxErrorCode createPipelineStates(FfxBrixelizerRawContext_Private* contex
                                                                                &pipelineDescription,
                                                                                context->effectContextId,
                                                                                &context->pipelineCascadeCompressBrick));
-    wcscpy_s(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_MERGE_BRICKS");
+    wcscpy(pipelineDescription.name, L"FFX_BRIXELIZER_PASS_CONTEXT_MERGE_BRICKS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface,
                                                                                FFX_EFFECT_BRIXELIZER,
                                                                                FFX_BRIXELIZER_PASS_CONTEXT_MERGE_BRICKS,
@@ -606,7 +607,7 @@ static void scheduleDispatchInternal(FfxBrixelizerRawContext_Private*   context,
 {
     context->gpuJobDescription = {FFX_GPU_JOB_COMPUTE};
 
-    wcscpy_s(context->gpuJobDescription.jobLabel, pipeline->name);
+    wcscpy(context->gpuJobDescription.jobLabel, pipeline->name);
     
     FFX_ASSERT(pipeline->srvTextureCount < FFX_MAX_NUM_SRVS);
 
@@ -619,7 +620,7 @@ static void scheduleDispatchInternal(FfxBrixelizerRawContext_Private*   context,
         context->gpuJobDescription.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 
 #ifdef FFX_DEBUG
-        wcscpy_s(context->gpuJobDescription.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
+        wcscpy(context->gpuJobDescription.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
 
@@ -636,7 +637,7 @@ static void scheduleDispatchInternal(FfxBrixelizerRawContext_Private*   context,
         context->gpuJobDescription.computeJobDescriptor.srvBuffers[currentShaderResourceViewIndex].size     = srvInfo.size;
         context->gpuJobDescription.computeJobDescriptor.srvBuffers[currentShaderResourceViewIndex].stride   = srvInfo.stride;
 #ifdef FFX_DEBUG
-        wcscpy_s(context->gpuJobDescription.computeJobDescriptor.srvBuffers[currentShaderResourceViewIndex].name, pipeline->srvBufferBindings[currentShaderResourceViewIndex].name);
+        wcscpy(context->gpuJobDescription.computeJobDescriptor.srvBuffers[currentShaderResourceViewIndex].name, pipeline->srvBufferBindings[currentShaderResourceViewIndex].name);
 #endif
     }
 
@@ -651,7 +652,7 @@ static void scheduleDispatchInternal(FfxBrixelizerRawContext_Private*   context,
         context->gpuJobDescription.computeJobDescriptor.uavTextures[currentUnorderedAccessViewIndex].resource = currentResource;
         context->gpuJobDescription.computeJobDescriptor.uavTextures[currentUnorderedAccessViewIndex].mip      = 0;
 #ifdef FFX_DEBUG
-        wcscpy_s(context->gpuJobDescription.computeJobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name, pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy(context->gpuJobDescription.computeJobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name, pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
 #endif
     }
 
@@ -669,7 +670,7 @@ static void scheduleDispatchInternal(FfxBrixelizerRawContext_Private*   context,
         context->gpuJobDescription.computeJobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].size     = context->uavInfo[currentResourceId].size;
         context->gpuJobDescription.computeJobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].stride   = context->uavInfo[currentResourceId].stride;
 #ifdef FFX_DEBUG
-        wcscpy_s(context->gpuJobDescription.computeJobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].name, pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy(context->gpuJobDescription.computeJobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].name, pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
 #endif
     }
 
@@ -691,7 +692,7 @@ static void scheduleDispatchInternal(FfxBrixelizerRawContext_Private*   context,
 
         context->gpuJobDescription.computeJobDescriptor.cbs[currentConstantBufferViewIndex] = context->constantBuffers[cbvInfoIdx];
 #ifdef FFX_DEBUG
-        wcscpy_s(context->gpuJobDescription.computeJobDescriptor.cbNames[currentConstantBufferViewIndex], pipeline->constantBufferBindings[currentConstantBufferViewIndex].name);
+        wcscpy(context->gpuJobDescription.computeJobDescriptor.cbNames[currentConstantBufferViewIndex], pipeline->constantBufferBindings[currentConstantBufferViewIndex].name);
 #endif
     }
 
@@ -709,7 +710,7 @@ static void scheduleCopy(FfxBrixelizerRawContext_Private* context, FfxResourceIn
 {
     context->gpuJobDescription = {FFX_GPU_JOB_COPY};
 
-    wcscpy_s(context->gpuJobDescription.jobLabel, name);
+    wcscpy(context->gpuJobDescription.jobLabel, name);
     
     context->gpuJobDescription.copyJobDescriptor.src       = src;
     context->gpuJobDescription.copyJobDescriptor.srcOffset = srcOffset;
@@ -949,7 +950,7 @@ static FfxErrorCode brixelizerCreate(FfxBrixelizerRawContext_Private* context, c
              FFX_RESOURCE_TYPE_BUFFER,
              FFX_RESOURCE_USAGE_UAV,
              FFX_SURFACE_FORMAT_R32_FLOAT,
-             context->totalBricks * sizeof(uint32_t),
+             static_cast<uint32_t>(context->totalBricks * sizeof(uint32_t)),
              sizeof(uint32_t),
              1,
              FFX_RESOURCE_FLAGS_NONE},
@@ -958,7 +959,7 @@ static FfxErrorCode brixelizerCreate(FfxBrixelizerRawContext_Private* context, c
              FFX_RESOURCE_TYPE_BUFFER,
              FFX_RESOURCE_USAGE_UAV,
              FFX_SURFACE_FORMAT_R32_FLOAT,
-             context->totalBricks * sizeof(uint32_t),
+             static_cast<uint32_t>(context->totalBricks * sizeof(uint32_t)),
              sizeof(uint32_t),
              1,
              FFX_RESOURCE_FLAGS_NONE},
@@ -967,7 +968,7 @@ static FfxErrorCode brixelizerCreate(FfxBrixelizerRawContext_Private* context, c
              FFX_RESOURCE_TYPE_BUFFER,
              FFX_RESOURCE_USAGE_UAV,
              FFX_SURFACE_FORMAT_R32_FLOAT,
-             context->totalBricks * sizeof(uint32_t),
+             static_cast<uint32_t>(context->totalBricks * sizeof(uint32_t)),
              sizeof(uint32_t),
              1,
              FFX_RESOURCE_FLAGS_NONE},
@@ -976,7 +977,7 @@ static FfxErrorCode brixelizerCreate(FfxBrixelizerRawContext_Private* context, c
              FFX_RESOURCE_TYPE_BUFFER,
              FFX_RESOURCE_USAGE_UAV,
              FFX_SURFACE_FORMAT_R32_FLOAT,
-             context->totalBricks * sizeof(uint32_t),
+             static_cast<uint32_t>(context->totalBricks * sizeof(uint32_t)),
              sizeof(uint32_t),
              1,
              FFX_RESOURCE_FLAGS_NONE},
@@ -985,7 +986,7 @@ static FfxErrorCode brixelizerCreate(FfxBrixelizerRawContext_Private* context, c
              FFX_RESOURCE_TYPE_BUFFER,
              FFX_RESOURCE_USAGE_UAV,
              FFX_SURFACE_FORMAT_R32_FLOAT,
-             context->totalBricks * sizeof(uint32_t) * 2,
+             static_cast<uint32_t>(context->totalBricks * sizeof(uint32_t) * 2),
              sizeof(uint32_t),
              1,
              FFX_RESOURCE_FLAGS_NONE },
@@ -994,7 +995,7 @@ static FfxErrorCode brixelizerCreate(FfxBrixelizerRawContext_Private* context, c
              FFX_RESOURCE_TYPE_BUFFER,
              FFX_RESOURCE_USAGE_UAV,
              FFX_SURFACE_FORMAT_R32_FLOAT,
-             context->totalBricks * sizeof(uint32_t),
+             static_cast<uint32_t>(context->totalBricks * sizeof(uint32_t)),
              sizeof(uint32_t),
              1,
              FFX_RESOURCE_FLAGS_NONE },

@@ -45,6 +45,7 @@
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
+#include <math.h>
 
 /// Interpret the bit layout of an IEEE-754 floating point value as an unsigned integer.
 ///

@@ -21,11 +21,13 @@
 // THE SOFTWARE.
 
 #include <cstring>     // for memset
-#include <cstdlib>     // for _countof
+#include <cstdlib>     // for std::extent<decltype
 #include <cmath>       // for fabs, abs, sinf, sqrt, etc.
 #include <array>
+#include <new>
 
 #define FFX_CPU
+#include <cwchar>
 #include <FidelityFX/host/ffx_dof.h>
 #include <FidelityFX/gpu/ffx_core.h>
 #include <ffx_object_management.h>
@@ -68,12 +70,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvIndex = 0; srvIndex < inoutPipeline->srvTextureCount; ++srvIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(srvTextureBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(srvTextureBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(srvTextureBindingTable[mapIndex].name, inoutPipeline->srvTextureBindings[srvIndex].name))
                 break;
         }
-        if (mapIndex == _countof(srvTextureBindingTable))
+        if (mapIndex == std::extent<decltype(srvTextureBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvTextureBindings[srvIndex].resourceIdentifier = srvTextureBindingTable[mapIndex].index;
@@ -82,12 +84,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavTextureCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavTextureBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(uavTextureBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(uavTextureBindingTable[mapIndex].name, inoutPipeline->uavTextureBindings[uavIndex].name))
                 break;
         }
-        if (mapIndex == _countof(uavTextureBindingTable))
+        if (mapIndex == std::extent<decltype(uavTextureBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavTextureBindings[uavIndex].resourceIdentifier = uavTextureBindingTable[mapIndex].index;
@@ -96,12 +98,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavBufferCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavTextureBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(uavTextureBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(uavTextureBindingTable[mapIndex].name, inoutPipeline->uavBufferBindings[uavIndex].name))
                 break;
         }
-        if (mapIndex == _countof(uavTextureBindingTable))
+        if (mapIndex == std::extent<decltype(uavTextureBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavBufferBindings[uavIndex].resourceIdentifier = uavTextureBindingTable[mapIndex].index;
@@ -110,12 +112,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t cbIndex = 0; cbIndex < inoutPipeline->constCount; ++cbIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(cbResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(cbResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(cbResourceBindingTable[mapIndex].name, inoutPipeline->constantBufferBindings[cbIndex].name))
                 break;
         }
-        if (mapIndex == _countof(cbResourceBindingTable))
+        if (mapIndex == std::extent<decltype(cbResourceBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->constantBufferBindings[cbIndex].resourceIdentifier = cbResourceBindingTable[mapIndex].index;
@@ -168,23 +170,23 @@ static FfxErrorCode createPipelineStates(FfxDofContext_Private* context)
     uint32_t contextFlags = context->contextDescription.flags;
 
     // Set up pipeline descriptors (basically RootSignature and binding)
-    wcscpy_s(pipelineDescription.name, L"DOF-DOWNSAMPLE-DEPTH");
+    wcscpy(pipelineDescription.name, L"DOF-DOWNSAMPLE-DEPTH");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_DOF, FFX_DOF_PASS_DOWNSAMPLE_DEPTH,
         getPipelinePermutationFlags(contextFlags, FFX_DOF_PASS_DOWNSAMPLE_DEPTH, supportedFP16, false),
         &pipelineDescription, context->effectContextId, &context->pipelineDsDepth));
-    wcscpy_s(pipelineDescription.name, L"DOF-DOWNSAMPLE-COLOR");
+    wcscpy(pipelineDescription.name, L"DOF-DOWNSAMPLE-COLOR");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_DOF, FFX_DOF_PASS_DOWNSAMPLE_COLOR,
         getPipelinePermutationFlags(contextFlags, FFX_DOF_PASS_DOWNSAMPLE_COLOR, supportedFP16, canForceWave64),
         &pipelineDescription, context->effectContextId, &context->pipelineDsColor));
-    wcscpy_s(pipelineDescription.name, L"DOF-DILATE");
+    wcscpy(pipelineDescription.name, L"DOF-DILATE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_DOF, FFX_DOF_PASS_DILATE,
         getPipelinePermutationFlags(contextFlags, FFX_DOF_PASS_DILATE, supportedFP16, canForceWave64),
         &pipelineDescription, context->effectContextId, &context->pipelineDilate));
-    wcscpy_s(pipelineDescription.name, L"DOF-BLUR");
+    wcscpy(pipelineDescription.name, L"DOF-BLUR");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_DOF, FFX_DOF_PASS_BLUR,
         getPipelinePermutationFlags(contextFlags, FFX_DOF_PASS_BLUR, supportedFP16, canForceWave64),
         &pipelineDescription, context->effectContextId, &context->pipelineBlur));
-    wcscpy_s(pipelineDescription.name, L"DOF-COMPOSITE");
+    wcscpy(pipelineDescription.name, L"DOF-COMPOSITE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_DOF, FFX_DOF_PASS_COMPOSITE,
         getPipelinePermutationFlags(contextFlags, FFX_DOF_PASS_COMPOSITE, supportedFP16, false),
         &pipelineDescription, context->effectContextId, &context->pipelineComposite));
@@ -202,7 +204,7 @@ static FfxErrorCode createPipelineStates(FfxDofContext_Private* context)
 static void scheduleDispatch(FfxDofContext_Private* context, const FfxDofDispatchDescription* params, const FfxPipelineState* pipeline, uint32_t dispatchX, uint32_t dispatchY)
 {
     FfxGpuJobDescription dispatchJob = {FFX_GPU_JOB_COMPUTE};
-    wcscpy_s(dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
 
     for (uint32_t currentShaderResourceViewIndex = 0; currentShaderResourceViewIndex < pipeline->srvTextureCount; ++currentShaderResourceViewIndex)
     {
@@ -210,7 +212,7 @@ static void scheduleDispatch(FfxDofContext_Private* context, const FfxDofDispatc
         const FfxResourceInternal currentResource = context->srvResources[currentResourceId];
         dispatchJob.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(dispatchJob.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].name,
+        wcscpy(dispatchJob.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].name,
                  pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
@@ -222,7 +224,7 @@ static void scheduleDispatch(FfxDofContext_Private* context, const FfxDofDispatc
 
         const uint32_t currentResourceId = binding.resourceIdentifier;
 #ifdef FFX_DEBUG
-        wcscpy_s(dispatchJob.computeJobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name, binding.name);
+        wcscpy(dispatchJob.computeJobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name, binding.name);
 #endif
         if (currentResourceId == FFX_DOF_RESOURCE_IDENTIFIER_INTERNAL_BILAT_COLOR)
         {
@@ -246,7 +248,7 @@ static void scheduleDispatch(FfxDofContext_Private* context, const FfxDofDispatc
     {
         const uint32_t currentResourceId = pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].resourceIdentifier;
 #ifdef FFX_DEBUG
-        wcscpy_s(dispatchJob.computeJobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].name,
+        wcscpy(dispatchJob.computeJobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].name,
                  pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
 #endif
 
@@ -260,7 +262,7 @@ static void scheduleDispatch(FfxDofContext_Private* context, const FfxDofDispatc
     dispatchJob.computeJobDescriptor.pipeline      = *pipeline;
 
 #ifdef FFX_DEBUG
-    wcscpy_s(dispatchJob.computeJobDescriptor.cbNames[0], pipeline->constantBufferBindings[0].name);
+    wcscpy(dispatchJob.computeJobDescriptor.cbNames[0], pipeline->constantBufferBindings[0].name);
 #endif
     dispatchJob.computeJobDescriptor.cbs[0] = context->constantBuffer;
 

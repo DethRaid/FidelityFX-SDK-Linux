@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 
 #include <string.h>     // for memset
-#include <stdlib.h>     // for _countof
+#include <stdlib.h>     // for std::extent<decltype
 #include <cmath>        // for fabs, abs, sinf, sqrt, etc.
 
 #ifdef __clang__
@@ -33,6 +33,7 @@
 #pragma warning(disable : 4505)
 #endif
 
+#include <cwchar>
 #include <FidelityFX/host/ffx_fsr1.h>
 #include <FidelityFX/gpu/ffx_core.h>
 #include <FidelityFX/gpu/fsr1/ffx_fsr1.h>
@@ -71,12 +72,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvIndex = 0; srvIndex < inoutPipeline->srvTextureCount; ++srvIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(srvTextureBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(srvTextureBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(srvTextureBindingTable[mapIndex].name, inoutPipeline->srvTextureBindings[srvIndex].name))
                 break;
         }
-        if (mapIndex == _countof(srvTextureBindingTable))
+        if (mapIndex == std::extent<decltype(srvTextureBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvTextureBindings[srvIndex].resourceIdentifier = srvTextureBindingTable[mapIndex].index;
@@ -85,12 +86,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavTextureCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavTextureBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(uavTextureBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(uavTextureBindingTable[mapIndex].name, inoutPipeline->uavTextureBindings[uavIndex].name))
                 break;
         }
-        if (mapIndex == _countof(uavTextureBindingTable))
+        if (mapIndex == std::extent<decltype(uavTextureBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavTextureBindings[uavIndex].resourceIdentifier = uavTextureBindingTable[mapIndex].index;
@@ -99,12 +100,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t cbIndex = 0; cbIndex < inoutPipeline->constCount; ++cbIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(cbResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(cbResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(cbResourceBindingTable[mapIndex].name, inoutPipeline->constantBufferBindings[cbIndex].name))
                 break;
         }
-        if (mapIndex == _countof(cbResourceBindingTable))
+        if (mapIndex == std::extent<decltype(cbResourceBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->constantBufferBindings[cbIndex].resourceIdentifier = cbResourceBindingTable[mapIndex].index;
@@ -168,15 +169,15 @@ static FfxErrorCode createPipelineStates(FfxFsr1Context_Private* context)
     uint32_t contextFlags = context->contextDescription.flags;
 
     // Set up pipeline descriptors (basically RootSignature and binding)
-    wcscpy_s(pipelineDescription.name, L"FSR1-EASU");
+    wcscpy(pipelineDescription.name, L"FSR1-EASU");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR1, FFX_FSR1_PASS_EASU,
         getPipelinePermutationFlags(contextFlags, FFX_FSR1_PASS_EASU, supportedFP16, canForceWave64),
         &pipelineDescription, context->effectContextId, &context->pipelineEASU));
-    wcscpy_s(pipelineDescription.name, L"FSR1-EASU_RCAS");
+    wcscpy(pipelineDescription.name, L"FSR1-EASU_RCAS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR1, FFX_FSR1_PASS_EASU_RCAS,
         getPipelinePermutationFlags(contextFlags, FFX_FSR1_PASS_EASU_RCAS, supportedFP16, canForceWave64),
         &pipelineDescription, context->effectContextId, &context->pipelineEASU_RCAS));
-    wcscpy_s(pipelineDescription.name, L"FSR1-RCAS");
+    wcscpy(pipelineDescription.name, L"FSR1-RCAS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR1, FFX_FSR1_PASS_RCAS,
         getPipelinePermutationFlags(contextFlags, FFX_FSR1_PASS_RCAS, supportedFP16, canForceWave64),
         &pipelineDescription, context->effectContextId, &context->pipelineRCAS));
@@ -192,7 +193,7 @@ static FfxErrorCode createPipelineStates(FfxFsr1Context_Private* context)
 static void scheduleDispatch(FfxFsr1Context_Private* context, const FfxFsr1DispatchDescription*, const FfxPipelineState* pipeline, uint32_t dispatchX, uint32_t dispatchY)
 {
     FfxGpuJobDescription dispatchJob = {FFX_GPU_JOB_COMPUTE};
-    wcscpy_s(dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
 
     for (uint32_t currentShaderResourceViewIndex = 0; currentShaderResourceViewIndex < pipeline->srvTextureCount; ++currentShaderResourceViewIndex) {
 
@@ -200,7 +201,7 @@ static void scheduleDispatch(FfxFsr1Context_Private* context, const FfxFsr1Dispa
         const FfxResourceInternal currentResource = context->srvResources[currentResourceId];
         dispatchJob.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(dispatchJob.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].name,
+        wcscpy(dispatchJob.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].name,
                  pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
@@ -209,7 +210,7 @@ static void scheduleDispatch(FfxFsr1Context_Private* context, const FfxFsr1Dispa
 
         const uint32_t currentResourceId = pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].resourceIdentifier;
 #ifdef FFX_DEBUG
-        wcscpy_s(dispatchJob.computeJobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name,
+        wcscpy(dispatchJob.computeJobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name,
                  pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
 #endif
         const FfxResourceInternal currentResource                       = context->uavResources[currentResourceId];
@@ -223,7 +224,7 @@ static void scheduleDispatch(FfxFsr1Context_Private* context, const FfxFsr1Dispa
     dispatchJob.computeJobDescriptor.pipeline      = *pipeline;
 
 #ifdef FFX_DEBUG
-    wcscpy_s(dispatchJob.computeJobDescriptor.cbNames[0], pipeline->constantBufferBindings[0].name);
+    wcscpy(dispatchJob.computeJobDescriptor.cbNames[0], pipeline->constantBufferBindings[0].name);
 #endif
     dispatchJob.computeJobDescriptor.cbs[0] = context->constantBuffer;
 

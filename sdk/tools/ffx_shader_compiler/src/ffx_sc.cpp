@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <cmath>
+
 #include "hlsl_compiler.h"
 #include "glsl_compiler.h"
 #include "utils.h"
@@ -310,40 +312,14 @@ void LaunchParameters::ParseCommandLine(int argCount, const wchar_t* const* args
 
 void LaunchParameters::EnsureOutputPathExistsAndMakeCanonical(std::wstring& inoutOutputPath)
 {
-
-    std::replace(inoutOutputPath.begin(), inoutOutputPath.end(), L'/', L'\\');
-
-    PWSTR canonicalOutputPath = NULL;
-
-    // Make the path canonical, convert to long path if needed and add the trailing slash
-    HRESULT hr = PathAllocCanonicalize(inoutOutputPath.c_str(), PATHCCH_ALLOW_LONG_PATHS | PATHCCH_ENSURE_TRAILING_SLASH, &canonicalOutputPath);
-    if (hr == S_OK)
-    {
-        PWSTR componentStart = NULL;
-
-        // Find the first character after "root" indicator -- which means a folder (path component) or file
-        hr = PathCchSkipRoot(canonicalOutputPath, &componentStart);
-        if (hr == S_OK)
-        {
-            // Try search for the next delimiter
-            wchar_t* componentEnd = wcsstr(componentStart, L"\\");
-
-            // If the delimiter is found, make sure the folder is created
-            while (componentEnd != NULL)
-            {
-                // Temporally replace delimiter '\\' with null-terminator, create directory, and restore the delimiter
-                *componentEnd = L'\0';
-                CreateDirectoryW(canonicalOutputPath, NULL);
-                *componentEnd = L'\\';
-
-                // advance to the next component (file or folder) and try to find the next delimiter (meaning -- it's folder), and repeat the loop.
-                componentStart = componentEnd + 1;
-                componentEnd = wcsstr(componentStart, L"\\");
-            }
-        }
-        inoutOutputPath = canonicalOutputPath;
-        LocalFree(canonicalOutputPath);
+    auto path = std::filesystem::path{inoutOutputPath};
+    path.make_preferred();
+    const auto canonicalOutputPath = canonical(path);
+    if (!exists(canonicalOutputPath)) {
+        std::filesystem::create_directories(canonicalOutputPath);
     }
+
+    inoutOutputPath = canonicalOutputPath.wstring();
 }
 
 void LaunchParameters::ParsePermutationOption(PermutationOption& outPermutationOption, const std::wstring arg)

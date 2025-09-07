@@ -28,15 +28,18 @@ std::string WCharToUTF8(const std::wstring& wstr)
     if (wstr.empty())
         return std::string();
 
-    return utf8::utf16to8(wstr);
+    // why are strings so cringe
+    // i have wasted so much of my one human life dealing with this
+    // i could be kissing girls but nooooooooo
+    if constexpr (sizeof(wchar_t) == sizeof(char16_t)) {
 
-    int size = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.size(), nullptr, 0, nullptr, nullptr);
+        return utf8::utf16to8(std::u16string_view{reinterpret_cast<const char16_t*>(wstr.c_str()), wstr.size()});
+    } else if constexpr (sizeof(wchar_t) == sizeof(char32_t)) {
+        return utf8::utf32to8(std::u32string_view{reinterpret_cast<const char32_t*>(wstr.c_str()), wstr.size()});
 
-    std::string str;
-    str.resize(size);
-    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.size(), &str[0], size, nullptr, nullptr);
-
-    return str;
+    } else {
+        throw std::runtime_error{"strings are cringe"};
+    }
 }
 
 std::wstring UTF8ToWChar(const std::string& str)
@@ -44,11 +47,15 @@ std::wstring UTF8ToWChar(const std::string& str)
     if (str.empty())
         return std::wstring();
 
-    int size = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.size(), nullptr, 0);
+    if constexpr (sizeof(wchar_t) == sizeof(char16_t)) {
+        const auto u16str = utf8::utf8to16(str);
+        return std::wstring{reinterpret_cast<const wchar_t*>(u16str.c_str()), u16str.size()};
 
-    std::wstring wstr;
-    wstr.resize(size);
-    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.size(), &wstr[0], size);
+    } else if constexpr (sizeof(wchar_t) == sizeof(char32_t)) {
+        const auto u32str = utf8::utf8to32(str);
+        return std::wstring{reinterpret_cast<const wchar_t*>(u32str.c_str()), u32str.size()};
 
-    return wstr;
+    } else {
+        throw std::runtime_error{"strings are cringe"};
+    }
 }

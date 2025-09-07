@@ -24,7 +24,7 @@
 
 #include "compiler.h"
 
-
+#ifdef _WIN32
 typedef HRESULT (*pD3DGetBlobPart)
     (LPCVOID pSrcData,
      SIZE_T SrcDataSize,
@@ -229,3 +229,4 @@ private:
 
     HMODULE                     m_DllHandle;
 };
+#endif

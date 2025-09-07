@@ -24,8 +24,6 @@
 #include "glsl_compiler.h"
 #include "utils.h"
 
-#include <Windows.h>
-#include <pathcch.h>
 #include <vector>
 #include <string_view>
 #include <filesystem>
@@ -33,8 +31,11 @@
 #include <locale>
 #include <stdexcept>
 
-
+#ifdef _WIN32
+#include <Windows.h>
+#include <pathcch.h>
 #pragma comment(lib, "pathcch.lib")
+#endif
 
 static const wchar_t* const APP_NAME    = L"FidelityFX-SC";
 static const wchar_t* const EXE_NAME    = L"FidelityFX_SC";
@@ -309,6 +310,7 @@ void LaunchParameters::ParseCommandLine(int argCount, const wchar_t* const* args
 
 void LaunchParameters::EnsureOutputPathExistsAndMakeCanonical(std::wstring& inoutOutputPath)
 {
+
     std::replace(inoutOutputPath.begin(), inoutOutputPath.end(), L'/', L'\\');
 
     PWSTR canonicalOutputPath = NULL;

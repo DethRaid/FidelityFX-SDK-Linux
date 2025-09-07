@@ -1,0 +1,3 @@
+[submodule "sdk/tools/ffx_shader_compiler/libs/utfcpp"]
+	path = sdk/tools/ffx_shader_compiler/libs/utfcpp
+	url = https://github.com/nemtrif/utfcpp.git

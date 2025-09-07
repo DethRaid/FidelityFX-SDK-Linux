@@ -21,11 +21,14 @@
 // THE SOFTWARE.
 
 #include "utils.h"
+#include "utf8.h"
 
 std::string WCharToUTF8(const std::wstring& wstr)
 {
     if (wstr.empty())
         return std::string();
+
+    return utf8::utf16to8(wstr);
 
     int size = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.size(), nullptr, 0, nullptr, nullptr);
 

@@ -23,6 +23,8 @@
 #include "hlsl_compiler.h"
 #include "utils.h"
 
+#ifdef _WIN32
+
 // D3D12SDKVersion needs to line up with the version number on Microsoft's DirectX12 Agility SDK Download page
 extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 614; }
 extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = u8".\\D3D12\\"; }
@@ -1100,3 +1102,4 @@ void HLSLCompiler::WritePermutationHeaderReflectionData(FILE* fp, const Permutat
     WriteResourceInfo(fp, hlslReflectionData->samplers.size(), permutation.name, "Sampler");
     WriteResourceInfo(fp, hlslReflectionData->rtAccelerationStructures.size(), permutation.name, "RTAccelerationStructure");
 }
+#endif

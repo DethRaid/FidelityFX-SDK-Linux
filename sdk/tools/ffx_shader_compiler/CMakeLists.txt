@@ -136,9 +136,10 @@ if(WIN32)
 endif()
 add_subdirectory(libs/glslangValidator)
 add_subdirectory(libs/tiny-process-library)
+add_subdirectory(libs/utfcpp)
 
 # Add link time dependencies
-target_link_libraries (${PROJECT_NAME} glslangValidator tiny-process-library)
+target_link_libraries (${PROJECT_NAME} glslangValidator utf8cpp tiny-process-library)
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} dxguid agilitysdk dxc)
 endif()

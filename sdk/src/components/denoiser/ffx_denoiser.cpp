@@ -21,8 +21,9 @@
 // THE SOFTWARE.
 
 #include <string.h>     // for memset
-#include <stdlib.h>     // for _countof
+#include <stdlib.h>     // for std::extent<decltype
 #include <cmath>        // for fabs, abs, sinf, sqrt, etc.
+#include <cwchar>
 
 #include <FidelityFX/host/ffx_denoiser.h>
 #include <FidelityFX/gpu/denoiser/ffx_denoiser_resources.h>
@@ -147,12 +148,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvIndex = 0; srvIndex < inoutPipeline->srvTextureCount; ++srvIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(srvTextureBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(srvTextureBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(srvTextureBindingTable[mapIndex].name, inoutPipeline->srvTextureBindings[srvIndex].name))
                 break;
         }
-        if (mapIndex == _countof(srvTextureBindingTable))
+        if (mapIndex == std::extent<decltype(srvTextureBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvTextureBindings[srvIndex].resourceIdentifier = srvTextureBindingTable[mapIndex].index;
@@ -162,12 +163,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvIndex = 0; srvIndex < inoutPipeline->srvBufferCount; ++srvIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(srvBufferBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(srvBufferBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(srvBufferBindingTable[mapIndex].name, inoutPipeline->srvBufferBindings[srvIndex].name))
                 break;
         }
-        if (mapIndex == _countof(srvBufferBindingTable))
+        if (mapIndex == std::extent<decltype(srvBufferBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvBufferBindings[srvIndex].resourceIdentifier = srvBufferBindingTable[mapIndex].index;
@@ -177,12 +178,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavBufferCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavBufferBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(uavBufferBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(uavBufferBindingTable[mapIndex].name, inoutPipeline->uavBufferBindings[uavIndex].name))
                 break;
         }
-        if (mapIndex == _countof(uavBufferBindingTable))
+        if (mapIndex == std::extent<decltype(uavBufferBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavBufferBindings[uavIndex].resourceIdentifier = uavBufferBindingTable[mapIndex].index;
@@ -193,12 +194,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavTextureCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavTextureBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(uavTextureBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(uavTextureBindingTable[mapIndex].name, inoutPipeline->uavTextureBindings[uavIndex].name))
                 break;
         }
-        if (mapIndex == _countof(uavTextureBindingTable))
+        if (mapIndex == std::extent<decltype(uavTextureBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavTextureBindings[uavIndex].resourceIdentifier = uavTextureBindingTable[mapIndex].index;
@@ -208,12 +209,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t cbIndex = 0; cbIndex < inoutPipeline->constCount; ++cbIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(cbResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(cbResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(cbResourceBindingTable[mapIndex].name, inoutPipeline->constantBufferBindings[cbIndex].name))
                 break;
         }
-        if (mapIndex == _countof(cbResourceBindingTable))
+        if (mapIndex == std::extent<decltype(cbResourceBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->constantBufferBindings[cbIndex].resourceIdentifier = cbResourceBindingTable[mapIndex].index;
@@ -345,13 +346,13 @@ static FfxErrorCode createReflectionsPipelineStates(FfxDenoiserContext_Private* 
     }
 
     // Indirect workloads
-    wcscpy_s(pipelineDescription.name, L"DENOISER-REFLECTIONS_REPROJECT");
+    wcscpy(pipelineDescription.name, L"DENOISER-REFLECTIONS_REPROJECT");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_DENOISER, FFX_DENOISER_PASS_REPROJECT_REFLECTIONS,
         getPipelinePermutationFlags(FFX_DENOISER_PASS_REPROJECT_REFLECTIONS, supportedFP16, canForceWave64), &pipelineDescription, context->effectContextId, &context->pipelineReprojectReflections));
-    wcscpy_s(pipelineDescription.name, L"DENOISER-REFLECTIONS_PREFILTER");
+    wcscpy(pipelineDescription.name, L"DENOISER-REFLECTIONS_PREFILTER");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_DENOISER, FFX_DENOISER_PASS_PREFILTER_REFLECTIONS,
         getPipelinePermutationFlags(FFX_DENOISER_PASS_PREFILTER_REFLECTIONS, supportedFP16, canForceWave64), &pipelineDescription, context->effectContextId, &context->pipelinePrefilterReflections));
-    wcscpy_s(pipelineDescription.name, L"DENOISER-REFLECTIONS_RESOLVE_TEMPORAL");
+    wcscpy(pipelineDescription.name, L"DENOISER-REFLECTIONS_RESOLVE_TEMPORAL");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_DENOISER, FFX_DENOISER_PASS_RESOLVE_TEMPORAL_REFLECTIONS,
         getPipelinePermutationFlags(FFX_DENOISER_PASS_RESOLVE_TEMPORAL_REFLECTIONS, supportedFP16, canForceWave64), &pipelineDescription, context->effectContextId, &context->pipelineResolveTemporalReflections));
 
@@ -371,7 +372,7 @@ static void populateReflectionsJobResources(FfxDenoiserContext_Private* context,
         const FfxResourceInternal currentResource = context->srvResources[currentResourceId];
         jobDescriptor->srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor->srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor->srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
 
@@ -380,7 +381,7 @@ static void populateReflectionsJobResources(FfxDenoiserContext_Private* context,
 
         const FfxResourceBinding binding = pipeline->uavTextureBindings[currentUnorderedAccessViewIndex];
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor->uavTextures[currentUnorderedAccessViewIndex].name, binding.name);
+        wcscpy(jobDescriptor->uavTextures[currentUnorderedAccessViewIndex].name, binding.name);
 #endif
         const uint32_t            bindEntry         = binding.arrayIndex;
         const uint32_t            currentResourceId = binding.resourceIdentifier;
@@ -399,14 +400,14 @@ static void populateReflectionsJobResources(FfxDenoiserContext_Private* context,
         const FfxResourceInternal currentResource = context->uavResources[currentResourceId];
         jobDescriptor->uavBuffers[currentUnorderedAccessViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor->uavBuffers[currentUnorderedAccessViewIndex].name, pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy(jobDescriptor->uavBuffers[currentUnorderedAccessViewIndex].name, pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
 #endif
     }
 
     // Constant buffers
     for (uint32_t currentRootConstantIndex = 0; currentRootConstantIndex < pipeline->constCount; ++currentRootConstantIndex) {
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor->cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
+        wcscpy(jobDescriptor->cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
 #endif
         jobDescriptor->cbs[currentRootConstantIndex] = context->reflectionsConstants[pipeline->constantBufferBindings[currentRootConstantIndex].resourceIdentifier];
     }
@@ -421,7 +422,7 @@ static void scheduleIndirectReflectionsDispatch(FfxDenoiserContext_Private* cont
     populateReflectionsJobResources(context, pipeline, &jobDescriptor);
 
     FfxGpuJobDescription dispatchJob = { FFX_GPU_JOB_COMPUTE };
-    wcscpy_s(dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
     dispatchJob.computeJobDescriptor = jobDescriptor;
     context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &dispatchJob);
 }
@@ -436,7 +437,7 @@ static void scheduleDispatch(FfxDenoiserContext_Private* context, const FfxDenoi
         const FfxResourceInternal currentResource = context->srvResources[currentResourceId];
         jobDescriptor.srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
 
@@ -444,7 +445,7 @@ static void scheduleDispatch(FfxDenoiserContext_Private* context, const FfxDenoi
 
         const uint32_t currentResourceId = pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].resourceIdentifier;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name, pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy(jobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name, pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
 #endif
 
         const FfxResourceInternal currentResource                           = context->uavResources[currentResourceId];
@@ -458,7 +459,7 @@ static void scheduleDispatch(FfxDenoiserContext_Private* context, const FfxDenoi
         const FfxResourceInternal currentResource = context->uavResources[currentResourceId];
         jobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].name, pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy(jobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].name, pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
 #endif
     }
 
@@ -468,7 +469,7 @@ static void scheduleDispatch(FfxDenoiserContext_Private* context, const FfxDenoi
         const FfxResourceInternal currentResource = context->srvResources[currentResourceId];
         jobDescriptor.srvBuffers[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.srvBuffers[currentShaderResourceViewIndex].name, pipeline->srvBufferBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor.srvBuffers[currentShaderResourceViewIndex].name, pipeline->srvBufferBindings[currentShaderResourceViewIndex].name);
 #endif
     }
 
@@ -479,13 +480,13 @@ static void scheduleDispatch(FfxDenoiserContext_Private* context, const FfxDenoi
 
     for (uint32_t currentRootConstantIndex = 0; currentRootConstantIndex < pipeline->constCount; ++currentRootConstantIndex) {
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
+        wcscpy(jobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
 #endif
         jobDescriptor.cbs[currentRootConstantIndex] = context->shadowsConstants[pipeline->constantBufferBindings[currentRootConstantIndex].resourceIdentifier];
     }
 
     FfxGpuJobDescription dispatchJob = {FFX_GPU_JOB_COMPUTE};
-    wcscpy_s(dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
     dispatchJob.computeJobDescriptor = jobDescriptor;
 
     context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &dispatchJob);
@@ -520,7 +521,7 @@ static FfxErrorCode denoiserDispatchShadows(FfxDenoiserContext_Private* context,
     {
         FfxGpuJobDescription job        = {};
         job.jobType                     = FFX_GPU_JOB_CLEAR_FLOAT;
-        wcscpy_s(job.jobLabel, L"Clear shadow map");
+        wcscpy(job.jobLabel, L"Clear shadow map");
         job.clearJobDescriptor.color[0] = 0.0f;
         job.clearJobDescriptor.color[1] = 0.0f;
         job.clearJobDescriptor.color[2] = 0.0f;
@@ -592,7 +593,7 @@ static FfxErrorCode denoiserDispatchShadows(FfxDenoiserContext_Private* context,
 
     // Copy current depth to previous depth
     FfxGpuJobDescription copyJob = { FFX_GPU_JOB_COPY };
-    wcscpy_s(copyJob.jobLabel, L"Copy current depth -> previous depth");
+    wcscpy(copyJob.jobLabel, L"Copy current depth -> previous depth");
     copyJob.copyJobDescriptor.src       = context->srvResources[FFX_DENOISER_RESOURCE_IDENTIFIER_DEPTH];
     copyJob.copyJobDescriptor.dst       = context->srvResources[FFX_DENOISER_RESOURCE_IDENTIFIER_PREVIOUS_DEPTH];
     copyJob.copyJobDescriptor.srcOffset = 0; 
@@ -656,7 +657,7 @@ static FfxErrorCode denoiserDispatchReflections(FfxDenoiserContext_Private* cont
     if (context->isFirstReflectionsFrame) {
         FfxGpuJobDescription job = {};
         job.jobType = FFX_GPU_JOB_CLEAR_FLOAT;
-        wcscpy_s(job.jobLabel, L"Zero initialize resource");
+        wcscpy(job.jobLabel, L"Zero initialize resource");
         job.clearJobDescriptor.color[0] = 0.0f;
         job.clearJobDescriptor.color[1] = 0.0f;
         job.clearJobDescriptor.color[2] = 0.0f;
@@ -714,7 +715,7 @@ static FfxErrorCode denoiserDispatchReflections(FfxDenoiserContext_Private* cont
     {
         FfxGpuJobDescription job = {};
         job.jobType = FFX_GPU_JOB_CLEAR_FLOAT;
-        wcscpy_s(job.jobLabel, L"Zero initialize resource");
+        wcscpy(job.jobLabel, L"Zero initialize resource");
         job.clearJobDescriptor.color[0] = 0.0f;
         job.clearJobDescriptor.color[1] = 0.0f;
         job.clearJobDescriptor.color[2] = 0.0f;
@@ -770,7 +771,7 @@ static FfxErrorCode denoiserDispatchReflections(FfxDenoiserContext_Private* cont
 
     // Copy Final result to output target
     FfxGpuJobDescription dispatchCopyJobDescriptor = { FFX_GPU_JOB_COPY };
-    wcscpy_s(dispatchCopyJobDescriptor.jobLabel, L"Copy to output");
+    wcscpy(dispatchCopyJobDescriptor.jobLabel, L"Copy to output");
     dispatchCopyJobDescriptor.copyJobDescriptor.src = context->srvResources[radianceAResourceIndex];
     dispatchCopyJobDescriptor.copyJobDescriptor.dst = context->srvResources[FFX_DENOISER_RESOURCE_IDENTIFIER_OUTPUT];
     dispatchCopyJobDescriptor.copyJobDescriptor.srcOffset = 0;
@@ -878,7 +879,7 @@ static FfxErrorCode denoiserShadowsCreateResources(FfxDenoiserContext_Private* c
                                                                    FFX_RESOURCE_TYPE_BUFFER,
                                                                    FFX_RESOURCE_USAGE_UAV,
                                                                    FFX_SURFACE_FORMAT_UNKNOWN,
-                                                                   sizeof(uint32_t) * tileCount,
+                                                                   static_cast<uint32_t>(sizeof(uint32_t) * tileCount),
                                                                    sizeof(uint32_t),
                                                                    1,
                                                                    FFX_RESOURCE_FLAGS_NONE,
@@ -889,7 +890,7 @@ static FfxErrorCode denoiserShadowsCreateResources(FfxDenoiserContext_Private* c
                                                                    FFX_RESOURCE_TYPE_BUFFER,
                                                                    FFX_RESOURCE_USAGE_UAV,
                                                                    FFX_SURFACE_FORMAT_UNKNOWN,
-                                                                   sizeof(uint32_t) * tileCount,
+                                                                   static_cast<uint32_t>(sizeof(uint32_t) * tileCount),
                                                                    sizeof(uint32_t),
                                                                    1,
                                                                    FFX_RESOURCE_FLAGS_NONE,

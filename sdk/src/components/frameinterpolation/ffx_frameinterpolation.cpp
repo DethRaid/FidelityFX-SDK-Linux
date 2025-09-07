@@ -33,6 +33,7 @@
 #pragma clang diagnostic ignored "-Wsign-compare"
 #endif
 
+#include <cstring>
 #include <FidelityFX/gpu/ffx_core.h>
 #include <FidelityFX/gpu/spd/ffx_spd.h>
 #include <ffx_object_management.h>
@@ -154,12 +155,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvIndex = 0; srvIndex < inoutPipeline->srvTextureCount; ++srvIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(srvResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(srvResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(srvResourceBindingTable[mapIndex].name, inoutPipeline->srvTextureBindings[srvIndex].name))
                 break;
         }
-        if (mapIndex == _countof(srvResourceBindingTable))
+        if (mapIndex == std::extent<decltype(srvResourceBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvTextureBindings[srvIndex].resourceIdentifier = srvResourceBindingTable[mapIndex].index;
@@ -169,12 +170,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavTextureCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(uavResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(uavResourceBindingTable[mapIndex].name, inoutPipeline->uavTextureBindings[uavIndex].name))
                 break;
         }
-        if (mapIndex == _countof(uavResourceBindingTable))
+        if (mapIndex == std::extent<decltype(uavResourceBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavTextureBindings[uavIndex].resourceIdentifier = uavResourceBindingTable[mapIndex].index;
@@ -183,12 +184,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t cbIndex = 0; cbIndex < inoutPipeline->constCount; ++cbIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(cbResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(cbResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(cbResourceBindingTable[mapIndex].name, inoutPipeline->constantBufferBindings[cbIndex].name))
                 break;
         }
-        if (mapIndex == _countof(cbResourceBindingTable))
+        if (mapIndex == std::extent<decltype(cbResourceBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->constantBufferBindings[cbIndex].resourceIdentifier = cbResourceBindingTable[mapIndex].index;
@@ -197,12 +198,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavBufferIndex = 0; uavBufferIndex < inoutPipeline->uavBufferCount; ++uavBufferIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(uavResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(uavResourceBindingTable[mapIndex].name, inoutPipeline->uavBufferBindings[uavBufferIndex].name))
                 break;
         }
-        if (mapIndex == _countof(uavResourceBindingTable))
+        if (mapIndex == std::extent<decltype(uavResourceBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavBufferBindings[uavBufferIndex].resourceIdentifier = uavResourceBindingTable[mapIndex].index;
@@ -211,12 +212,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvBufferIndex = 0; srvBufferIndex < inoutPipeline->srvBufferCount; ++srvBufferIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(srvResourceBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(srvResourceBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(srvResourceBindingTable[mapIndex].name, inoutPipeline->srvBufferBindings[srvBufferIndex].name))
                 break;
         }
-        if (mapIndex == _countof(srvResourceBindingTable))
+        if (mapIndex == std::extent<decltype(srvResourceBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvBufferBindings[srvBufferIndex].resourceIdentifier = srvResourceBindingTable[mapIndex].index;
@@ -288,7 +289,7 @@ static FfxErrorCode createPipelineStates(FfxFrameInterpolationContext_Private* c
     // Set up pipeline descriptor (basically RootSignature and binding)
     auto CreateComputePipeline = [&](FfxPass pass, const wchar_t* name, FfxPipelineState* pipeline) -> FfxErrorCode {
         ffxSafeReleasePipeline(&context->contextDescription.backendInterface, pipeline, context->effectContextId);
-        wcscpy_s(pipelineDescription.name, name);
+        wcscpy(pipelineDescription.name, name);
         FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(
             &context->contextDescription.backendInterface,
             FFX_EFFECT_FRAMEINTERPOLATION,
@@ -303,7 +304,7 @@ static FfxErrorCode createPipelineStates(FfxFrameInterpolationContext_Private* c
     };
 
     auto CreateRasterPipeline = [&](FfxPass pass, const wchar_t* name, FfxPipelineState* pipeline) -> FfxErrorCode {
-        wcscpy_s(pipelineDescription.name, name);
+        wcscpy(pipelineDescription.name, name);
         pipelineDescription.stage            = (FfxBindStage)(FFX_BIND_VERTEX_SHADER_STAGE | FFX_BIND_PIXEL_SHADER_STAGE);
         pipelineDescription.backbufferFormat = context->contextDescription.backBufferFormat;
         FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(
@@ -577,7 +578,7 @@ static void scheduleDispatch(FfxFrameInterpolationContext_Private* context, cons
         const FfxResourceInternal currentResource = context->srvResources[currentResourceId];
         jobDescriptor.srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
 
@@ -585,7 +586,7 @@ static void scheduleDispatch(FfxFrameInterpolationContext_Private* context, cons
 
         const uint32_t currentResourceId = pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].resourceIdentifier;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name, pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy(jobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name, pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
 #endif
 
         if (currentResourceId >= FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_INPAINTING_PYRAMID_MIPMAP_0 && currentResourceId <= FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_INPAINTING_PYRAMID_MIPMAP_12)
@@ -609,7 +610,7 @@ static void scheduleDispatch(FfxFrameInterpolationContext_Private* context, cons
 
     for (uint32_t currentRootConstantIndex = 0; currentRootConstantIndex < pipeline->constCount; ++currentRootConstantIndex) {
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
+        wcscpy(jobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
 #endif
         jobDescriptor.cbs[currentRootConstantIndex] = context->constantBuffers[pipeline->constantBufferBindings[currentRootConstantIndex].resourceIdentifier];
     }
@@ -619,7 +620,7 @@ static void scheduleDispatch(FfxFrameInterpolationContext_Private* context, cons
         const uint32_t currentResourceId = pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].resourceIdentifier;
         jobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].resource = context->uavResources[currentResourceId];        
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].name, pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy(jobDescriptor.uavBuffers[currentUnorderedAccessViewIndex].name, pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
 #endif
     }
 
@@ -628,12 +629,12 @@ static void scheduleDispatch(FfxFrameInterpolationContext_Private* context, cons
         const uint32_t currentResourceId = pipeline->srvBufferBindings[currentShaderResourceViewIndex].resourceIdentifier;
         jobDescriptor.srvBuffers[currentShaderResourceViewIndex].resource = context->srvResources[currentResourceId];
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.srvBuffers[currentShaderResourceViewIndex].name, pipeline->srvBufferBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor.srvBuffers[currentShaderResourceViewIndex].name, pipeline->srvBufferBindings[currentShaderResourceViewIndex].name);
 #endif
     }
 
     FfxGpuJobDescription dispatchJob = { FFX_GPU_JOB_COMPUTE };
-    wcscpy_s(dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
     dispatchJob.computeJobDescriptor = jobDescriptor;
 
     context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &dispatchJob);
@@ -891,7 +892,7 @@ FFX_API FfxErrorCode ffxFrameInterpolationPrepare(FfxFrameInterpolationContext* 
         const bool bInverted = (contextPrivate->contextDescription.flags & FFX_FRAMEINTERPOLATION_ENABLE_DEPTH_INVERTED) == FFX_FRAMEINTERPOLATION_ENABLE_DEPTH_INVERTED;
         const float clearDepthValue[]{bInverted ? 0.f : 1.f, bInverted ? 0.f : 1.f, bInverted ? 0.f : 1.f, bInverted ? 0.f : 1.f};
         memcpy(clearJob.clearJobDescriptor.color, clearDepthValue, 4 * sizeof(float));
-        wcscpy_s(clearJob.jobLabel, L"Clear Reconstructed Previous Nearest Depth");
+        wcscpy(clearJob.jobLabel, L"Clear Reconstructed Previous Nearest Depth");
         clearJob.clearJobDescriptor.target = contextPrivate->uavResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_RECONSTRUCTED_DEPTH_PREVIOUS_FRAME];
         contextPrivate->contextDescription.backendInterface.fpScheduleGpuJob(&contextPrivate->contextDescription.backendInterface, &clearJob);
     }
@@ -1099,7 +1100,7 @@ FFX_API FfxErrorCode ffxFrameInterpolationDispatch(FfxFrameInterpolationContext*
             contextPrivate->uavResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_INPAINTING_MASK],
             contextPrivate->uavResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_DISOCCLUSION_MASK]
         };
-        for (int i = 0; i < _countof(aliasableResources); ++i)
+        for (int i = 0; i < std::extent<decltype(aliasableResources)>::value; ++i)
         {
             FfxGpuJobDescription discardJob        = {FFX_GPU_JOB_DISCARD};
             discardJob.discardJobDescriptor.target = aliasableResources[i];
@@ -1145,7 +1146,7 @@ FFX_API FfxErrorCode ffxFrameInterpolationDispatch(FfxFrameInterpolationContext*
                 const float clearDepthValue[]{bInverted ? 0.f : 1.f, bInverted ? 0.f : 1.f, bInverted ? 0.f : 1.f, bInverted ? 0.f : 1.f};
                 memcpy(clearJob.clearJobDescriptor.color, clearDepthValue, 4 * sizeof(float));
 
-                wcscpy_s(clearJob.jobLabel, L"Clear Reconstructed Depth Interpolated Frame");
+                wcscpy(clearJob.jobLabel, L"Clear Reconstructed Depth Interpolated Frame");
                 clearJob.clearJobDescriptor.target =
                     contextPrivate->uavResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_RECONSTRUCTED_DEPTH_INTERPOLATED_FRAME];
                 contextPrivate->contextDescription.backendInterface.fpScheduleGpuJob(&contextPrivate->contextDescription.backendInterface, &clearJob);
@@ -1198,10 +1199,10 @@ FFX_API FfxErrorCode ffxFrameInterpolationDispatch(FfxFrameInterpolationContext*
         // store current buffer
         {
             FfxGpuJobDescription copyJobs[] = { {FFX_GPU_JOB_COPY} };
-            FfxResourceInternal  copySources[_countof(copyJobs)] = { contextPrivate->srvResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_CURRENT_INTERPOLATION_SOURCE] };
-            FfxResourceInternal destSources[_countof(copyJobs)] = { contextPrivate->uavResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_PREVIOUS_INTERPOLATION_SOURCE] };
+            FfxResourceInternal  copySources[std::extent<decltype(copyJobs)>::value] = { contextPrivate->srvResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_CURRENT_INTERPOLATION_SOURCE] };
+            FfxResourceInternal destSources[std::extent<decltype(copyJobs)>::value] = { contextPrivate->uavResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_PREVIOUS_INTERPOLATION_SOURCE] };
 
-            for (int i = 0; i < _countof(copyJobs); ++i)
+            for (int i = 0; i < std::extent<decltype(copyJobs)>::value; ++i)
             {
                 copyJobs[i].copyJobDescriptor.src = copySources[i];
                 copyJobs[i].copyJobDescriptor.dst = destSources[i];

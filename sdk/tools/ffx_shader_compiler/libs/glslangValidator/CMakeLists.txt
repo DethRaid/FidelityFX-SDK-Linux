@@ -21,7 +21,9 @@
 # THE SOFTWARE.
 
 add_library(glslangValidator INTERFACE)
-target_include_directories(dxc INTERFACE BEFORE "inc/")
+if(WIN32)
+    target_include_directories(dxc INTERFACE BEFORE "inc/")
+endif()
 
 set(glslangValidator_binaries
     ${CMAKE_CURRENT_SOURCE_DIR}/bin/x64/glslangValidator.exe)

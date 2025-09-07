@@ -49,9 +49,11 @@ if (CMAKE_GENERATOR_PLATFORM STREQUAL x64 OR
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
 endif()
 
-# Check for Visual Studio 2019's build tooling
-if(MSVC_TOOLSET_VERSION VERSION_LESS 142)
-    message(FATAL_ERROR "Cannot find MSVC toolset version 142 or greater. Please make sure Visual Studio 2019 or newer installed")
+if(WIN32)
+    # Check for Visual Studio 2019's build tooling
+    if(MSVC_TOOLSET_VERSION VERSION_LESS 142)
+        message(FATAL_ERROR "Cannot find MSVC toolset version 142 or greater. Please make sure Visual Studio 2019 or newer installed")
+    endif()
 endif()
 
 # Generate the output binary in the /bin directory
@@ -126,13 +128,18 @@ add_executable(${PROJECT_NAME} ${sources})
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 # Add external libs
-add_subdirectory(libs/agilitysdk)
-add_subdirectory(libs/dxc)
+if(WIN32)
+    add_subdirectory(libs/agilitysdk)
+    add_subdirectory(libs/dxc)
+endif()
 add_subdirectory(libs/glslangValidator)
 add_subdirectory(libs/tiny-process-library)
 
 # Add link time dependencies
-target_link_libraries (${PROJECT_NAME} dxguid agilitysdk dxc glslangValidator tiny-process-library)
+target_link_libraries (${PROJECT_NAME} glslangValidator tiny-process-library)
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} dxguid agilitysdk dxc)
+endif()
 target_include_directories (${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/MD5
                                                    ${CMAKE_CURRENT_SOURCE_DIR}/libs/SPIRV-Reflect
                                                    ${CMAKE_CURRENT_SOURCE_DIR}/libs/tiny-process-library)

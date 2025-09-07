@@ -190,12 +190,12 @@ static void patchResourceBindings(FfxPipelineState* inoutPipeline)
         FfxResourceBinding& binding = inoutPipeline->srvTextureBindings[srvTextureIndex];
 
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(srvResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(srvResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(srvResourceBindingTable[mapIndex].name, binding.name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(srvResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(srvResourceBindingTable)>)
             return;
 
         binding.resourceIdentifier = srvResourceBindingTable[mapIndex].index + binding.arrayIndex;
@@ -206,12 +206,12 @@ static void patchResourceBindings(FfxPipelineState* inoutPipeline)
         FfxResourceBinding& binding = inoutPipeline->srvBufferBindings[srvBufferIndex];
 
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(srvResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(srvResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(srvResourceBindingTable[mapIndex].name, binding.name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(srvResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(srvResourceBindingTable)>)
             return;
 
         binding.resourceIdentifier = srvResourceBindingTable[mapIndex].index + binding.arrayIndex;
@@ -220,12 +220,12 @@ static void patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavTextureIndex = 0; uavTextureIndex < inoutPipeline->uavTextureCount; ++uavTextureIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(uavResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(uavResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(uavResourceBindingTable[mapIndex].name, inoutPipeline->uavTextureBindings[uavTextureIndex].name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(uavResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(uavResourceBindingTable)>)
             return;
 
         inoutPipeline->uavTextureBindings[uavTextureIndex].resourceIdentifier = uavResourceBindingTable[mapIndex].index;
@@ -236,12 +236,12 @@ static void patchResourceBindings(FfxPipelineState* inoutPipeline)
         FfxResourceBinding& binding = inoutPipeline->uavBufferBindings[uavBufferIndex];
 
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(uavResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(uavResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(uavResourceBindingTable[mapIndex].name, binding.name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(uavResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(uavResourceBindingTable)>)
             return;
 
         binding.resourceIdentifier = uavResourceBindingTable[mapIndex].index + binding.arrayIndex;
@@ -252,12 +252,12 @@ static void patchResourceBindings(FfxPipelineState* inoutPipeline)
         FfxResourceBinding& binding = inoutPipeline->constantBufferBindings[cbvIndex];
 
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(cbvResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(cbvResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(cbvResourceBindingTable[mapIndex].name, binding.name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(cbvResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(cbvResourceBindingTable)>)
             return;
 
         binding.resourceIdentifier = cbvResourceBindingTable[mapIndex].index;

@@ -55,11 +55,7 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup ffxFsr2
-#ifdef __clang__
-#define FFX_FSR2_CONTEXT_SIZE (628600 / 4)
-#else
 #define FFX_FSR2_CONTEXT_SIZE (FFX_SDK_DEFAULT_CONTEXT_SIZE)
-#endif
 
 #if defined(__cplusplus)
 extern "C" {

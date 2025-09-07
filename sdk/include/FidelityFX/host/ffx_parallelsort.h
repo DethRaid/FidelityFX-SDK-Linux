@@ -57,7 +57,11 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup FfxParallelSort
+#ifdef __clang__
 #define FFX_PARALLELSORT_CONTEXT_SIZE      (2859656 / 4)
+#else
+#define FFX_PARALLELSORT_CONTEXT_SIZE (373794)
+#endif
 
 #if defined(__cplusplus)
 extern "C" {

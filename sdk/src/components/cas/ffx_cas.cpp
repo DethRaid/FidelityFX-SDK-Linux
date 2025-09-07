@@ -21,7 +21,6 @@
 // THE SOFTWARE.
 
 #include <string.h>  // for memset
-#include <stdlib.h>  // for std::extent<decltype
 #include <cmath>     // for fabs, abs, sinf, sqrt, etc.
 
 #ifdef __clang__
@@ -61,12 +60,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvIndex = 0; srvIndex < inoutPipeline->srvTextureCount; ++srvIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(s_SrvResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(s_SrvResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(s_SrvResourceBindingTable[mapIndex].name, inoutPipeline->srvTextureBindings[srvIndex].name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(s_SrvResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(s_SrvResourceBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvTextureBindings[srvIndex].resourceIdentifier = s_SrvResourceBindingTable[mapIndex].index;
@@ -75,12 +74,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavTextureCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(s_UavResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(s_UavResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(s_UavResourceBindingTable[mapIndex].name, inoutPipeline->uavTextureBindings[uavIndex].name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(s_UavResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(s_UavResourceBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavTextureBindings[uavIndex].resourceIdentifier = s_UavResourceBindingTable[mapIndex].index;
@@ -89,12 +88,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t cbIndex = 0; cbIndex < inoutPipeline->constCount; ++cbIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(s_CbResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(s_CbResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(s_CbResourceBindingTable[mapIndex].name, inoutPipeline->constantBufferBindings[cbIndex].name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(s_CbResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(s_CbResourceBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->constantBufferBindings[cbIndex].resourceIdentifier = s_CbResourceBindingTable[mapIndex].index;

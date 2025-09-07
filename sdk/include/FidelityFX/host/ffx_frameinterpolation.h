@@ -52,11 +52,7 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup FRAMEINTERPOLATIONFRAMEINTERPOLATION
-#if __clang__
-#define FFX_FRAMEINTERPOLATION_CONTEXT_SIZE (768072 / 4)
-#else
 #define FFX_FRAMEINTERPOLATION_CONTEXT_SIZE (FFX_SDK_DEFAULT_CONTEXT_SIZE)
-#endif
 
 #if defined(__cplusplus)
 extern "C" {

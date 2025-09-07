@@ -57,7 +57,11 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup ffxCas
+#ifdef __clang__
 #define FFX_CAS_CONTEXT_SIZE (70104 / 4)
+#else
+#define FFX_CAS_CONTEXT_SIZE (9206)
+#endif
 
 #if defined(__cplusplus)
 extern "C" {

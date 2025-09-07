@@ -155,12 +155,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvIndex = 0; srvIndex < inoutPipeline->srvTextureCount; ++srvIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(srvResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(srvResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(srvResourceBindingTable[mapIndex].name, inoutPipeline->srvTextureBindings[srvIndex].name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(srvResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(srvResourceBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvTextureBindings[srvIndex].resourceIdentifier = srvResourceBindingTable[mapIndex].index;
@@ -170,12 +170,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavTextureCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(uavResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(uavResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(uavResourceBindingTable[mapIndex].name, inoutPipeline->uavTextureBindings[uavIndex].name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(uavResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(uavResourceBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavTextureBindings[uavIndex].resourceIdentifier = uavResourceBindingTable[mapIndex].index;
@@ -184,12 +184,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t cbIndex = 0; cbIndex < inoutPipeline->constCount; ++cbIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(cbResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(cbResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(cbResourceBindingTable[mapIndex].name, inoutPipeline->constantBufferBindings[cbIndex].name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(cbResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(cbResourceBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->constantBufferBindings[cbIndex].resourceIdentifier = cbResourceBindingTable[mapIndex].index;
@@ -198,12 +198,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavBufferIndex = 0; uavBufferIndex < inoutPipeline->uavBufferCount; ++uavBufferIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(uavResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(uavResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(uavResourceBindingTable[mapIndex].name, inoutPipeline->uavBufferBindings[uavBufferIndex].name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(uavResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(uavResourceBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavBufferBindings[uavBufferIndex].resourceIdentifier = uavResourceBindingTable[mapIndex].index;
@@ -212,12 +212,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvBufferIndex = 0; srvBufferIndex < inoutPipeline->srvBufferCount; ++srvBufferIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(srvResourceBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(srvResourceBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(srvResourceBindingTable[mapIndex].name, inoutPipeline->srvBufferBindings[srvBufferIndex].name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(srvResourceBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(srvResourceBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvBufferBindings[srvBufferIndex].resourceIdentifier = srvResourceBindingTable[mapIndex].index;
@@ -1100,7 +1100,7 @@ FFX_API FfxErrorCode ffxFrameInterpolationDispatch(FfxFrameInterpolationContext*
             contextPrivate->uavResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_INPAINTING_MASK],
             contextPrivate->uavResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_DISOCCLUSION_MASK]
         };
-        for (int i = 0; i < std::extent<decltype(aliasableResources)>::value; ++i)
+        for (int i = 0; i < std::extent_v<decltype(aliasableResources)>; ++i)
         {
             FfxGpuJobDescription discardJob        = {FFX_GPU_JOB_DISCARD};
             discardJob.discardJobDescriptor.target = aliasableResources[i];
@@ -1199,10 +1199,10 @@ FFX_API FfxErrorCode ffxFrameInterpolationDispatch(FfxFrameInterpolationContext*
         // store current buffer
         {
             FfxGpuJobDescription copyJobs[] = { {FFX_GPU_JOB_COPY} };
-            FfxResourceInternal  copySources[std::extent<decltype(copyJobs)>::value] = { contextPrivate->srvResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_CURRENT_INTERPOLATION_SOURCE] };
-            FfxResourceInternal destSources[std::extent<decltype(copyJobs)>::value] = { contextPrivate->uavResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_PREVIOUS_INTERPOLATION_SOURCE] };
+            FfxResourceInternal  copySources[std::extent_v<decltype(copyJobs)>] = { contextPrivate->srvResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_CURRENT_INTERPOLATION_SOURCE] };
+            FfxResourceInternal destSources[std::extent_v<decltype(copyJobs)>] = { contextPrivate->uavResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_PREVIOUS_INTERPOLATION_SOURCE] };
 
-            for (int i = 0; i < std::extent<decltype(copyJobs)>::value; ++i)
+            for (int i = 0; i < std::extent_v<decltype(copyJobs)>; ++i)
             {
                 copyJobs[i].copyJobDescriptor.src = copySources[i];
                 copyJobs[i].copyJobDescriptor.dst = destSources[i];

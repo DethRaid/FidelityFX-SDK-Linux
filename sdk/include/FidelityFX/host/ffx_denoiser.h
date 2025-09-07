@@ -55,7 +55,7 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup Denoiser
-#if __linux__
+#ifdef __clang__
 #define FFX_DENOISER_CONTEXT_SIZE (558608 / 4)
 #else
 #define FFX_DENOISER_CONTEXT_SIZE (73098)

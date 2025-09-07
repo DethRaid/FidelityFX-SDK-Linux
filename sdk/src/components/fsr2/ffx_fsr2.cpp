@@ -327,12 +327,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvIndex = 0; srvIndex < inoutPipeline->srvTextureCount; ++srvIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(srvTextureBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(srvTextureBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(srvTextureBindingTable[mapIndex].name, inoutPipeline->srvTextureBindings[srvIndex].name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(srvTextureBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(srvTextureBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvTextureBindings[srvIndex].resourceIdentifier = srvTextureBindingTable[mapIndex].index;
@@ -341,12 +341,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavTextureCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(uavTextureBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(uavTextureBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(uavTextureBindingTable[mapIndex].name, inoutPipeline->uavTextureBindings[uavIndex].name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(uavTextureBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(uavTextureBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavTextureBindings[uavIndex].resourceIdentifier = uavTextureBindingTable[mapIndex].index;
@@ -355,12 +355,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t cbIndex = 0; cbIndex < inoutPipeline->constCount; ++cbIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < std::extent<decltype(constantBufferBindingTable)>::value; ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(constantBufferBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(constantBufferBindingTable[mapIndex].name, inoutPipeline->constantBufferBindings[cbIndex].name))
                 break;
         }
-        if (mapIndex == std::extent<decltype(constantBufferBindingTable)>::value)
+        if (mapIndex == std::extent_v<decltype(constantBufferBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->constantBufferBindings[cbIndex].resourceIdentifier = constantBufferBindingTable[mapIndex].index;

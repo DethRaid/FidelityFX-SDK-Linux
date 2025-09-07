@@ -260,6 +260,7 @@ FFX_API FfxErrorCode ffxReplaceSwapchainForFrameinterpolationVK(FfxCommandQueue 
 /// @ingroup VKFrameInterpolation
 FFX_API FfxErrorCode ffxWaitForPresents(FfxSwapchain gameSwapChain);
 
+#ifdef _WIN32
 /// Registers a <c><i>FfxResource</i></c> to use for UI with the provided <c><i>FfxSwapchain</i></c>.
 ///
 /// @param [in] gameSwapChain           The <c><i>FfxSwapchain</i></c> to to register the UI resource with.
@@ -364,6 +365,7 @@ struct FfxSwapchainReplacementFunctions
     PFN_getLastPresentCountFFX  getLastPresentCountFFX;
 };
 FFX_API FfxErrorCode ffxGetSwapchainReplacementFunctionsVK(FfxDevice device, FfxSwapchainReplacementFunctions* functions);
+#endif
 
 #if defined(__cplusplus)
 }

@@ -300,7 +300,7 @@ void LaunchParameters::ParseCommandLine(int argCount, const wchar_t* const* args
             debugCompile = true;
         } else if (args[i][0] == L'-')
         {
-            compilerArgs.push_back(args[i++]);
+            compilerArgs.emplace_back(args[i++]);
 
             // Attempt to parse the next arguments in case there are some parameters for the compiler args.
             for (; i < argCount; i++)
@@ -708,7 +708,7 @@ void Application::CompilePermutation(Permutation& permutation)
     // Compile it with specified arguments.
     // ------------------------------------------------------------------------------------------------
     if (!m_Compiler->Compile(permutation, args, m_WriteMutex))
-    {   
+    {
         fprintf(stderr, "failed to compile shader : %s\n", permutation.sourcePath.generic_string().c_str());
         throw std::runtime_error("failed to compile shader: " + permutation.sourcePath.generic_string());
     }
@@ -1080,6 +1080,9 @@ int wmain(int argc, wchar_t** argv)
 
         Application app(params);
         app.Process();
+
+        const auto inputFileString = params.inputFile.string();
+        fprintf(stdout, "ffx_sc finished compiling %s\n", inputFileString.c_str());
 
         return 0;
     }

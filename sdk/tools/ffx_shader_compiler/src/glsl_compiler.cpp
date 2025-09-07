@@ -66,6 +66,12 @@ size_t GLSLShaderBinary::BufferSize()
     return spirv.size();
 }
 
+#ifdef _WIN32
+static std::string glslangDefaultPath = "glslangValidator.exe";
+#else
+static std::string glslangDefaultPath = "glslangValidator";
+#endif
+
 GLSLCompiler::GLSLCompiler(const std::string& glslangExe,
                            const std::string& shaderPath,
                            const std::string& shaderName,
@@ -74,7 +80,7 @@ GLSLCompiler::GLSLCompiler(const std::string& glslangExe,
                            bool               disableLogs,
                            bool               debugCompile)
     : ICompiler(shaderPath, shaderName, shaderFileName, outputPath, disableLogs, debugCompile)
-    , m_GlslangExe(glslangExe.empty() ? "glslangValidator.exe" : glslangExe)
+    , m_GlslangExe(glslangExe.empty() ? glslangDefaultPath : glslangExe)
 {
     fs::create_directory(m_OutputPath + "/" + m_ShaderName + "_temp");
 }
@@ -230,7 +236,7 @@ bool GLSLCompiler::GLSLCompiler::Compile(Permutation& permutation, const std::ve
 
         while (std::getline(ss, token, '\n'))
         {
-            if (token != "\r") // avoid carriage return
+            if (!token.empty() && token != "\r") // avoid carriage return
             {
                 // parse file / line info
                 int lineNumber = -1;
@@ -251,12 +257,17 @@ bool GLSLCompiler::GLSLCompiler::Compile(Permutation& permutation, const std::ve
                         token.erase(0, end + 2);
                     }
                 }
+#ifdef _WIN32
                 token.pop_back();
+#endif
                 errors.push_back(ErrorData{token, lineNumber});
             }
         }
     };
 
+#ifndef NDEBUG
+    fprintf(stdout, "%s\n", cmdLine.c_str());
+#endif
     tpl::Process process(cmdLine, "", func, func);
 
     bool succeeded = process.get_exit_status() == 0;

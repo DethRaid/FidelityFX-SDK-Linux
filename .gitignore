@@ -373,3 +373,5 @@ sdk/src/components/fsr3/FSR3_GDK/Gaming.Xbox.Scarlett.x64/
 sdk/src/components/fsr3upscaler/FSR3Upscaler_GDK/Gaming.Xbox.Scarlett.x64/
 
 sdk/src/components/opticalflow/OpticalFlow_GDK/Gaming.Xbox.Scarlett.x64/
+
+.idea/

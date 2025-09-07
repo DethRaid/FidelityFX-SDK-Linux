@@ -116,7 +116,7 @@
     {                                                                                               \
         FFX_BREADCRUMBS_APPEND_STRING(buff, count, FFX_BREADCRUMBS_PRINTING_INDENT #member ": 0x"); \
         char _hexStr[maxLength];                                                                    \
-        const size_t _length = sprintf(_hexStr, maxLength, format, baseStruct.member);              \
+        const size_t _length = sprintf(_hexStr, format, baseStruct.member);                         \
         buff = (char*)ffxBreadcrumbsAppendList(buff, count, 1, _length + 1, allocs);                \
         memcpy(buff + count, _hexStr, _length);                                                     \
         count += _length;                                                                           \

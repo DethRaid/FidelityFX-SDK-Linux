@@ -482,103 +482,103 @@ static FfxErrorCode createPipelineStates(FfxCacaoContext_Private* context)
     }
 
     // Set up pipeline descriptors (basically RootSignature and binding)
-    wcscpy_s(pipelineDescription.name, L"CACAO-CLEAR_LOAD_COUNTER");
+    wcscpy(pipelineDescription.name, L"CACAO-CLEAR_LOAD_COUNTER");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineClearLoadCounter, FFX_CACAO_PASS_CLEAR_LOAD_COUNTER, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-PREPARE_DOWNSAMPLED_DEPTHS");
+    wcscpy(pipelineDescription.name, L"CACAO-PREPARE_DOWNSAMPLED_DEPTHS");
     createCacaoPipeline(context, pipelineDescription, &context->pipelinePrepareDownsampledDepths, FFX_CACAO_PASS_PREPARE_DOWNSAMPLED_DEPTHS, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-PREPARE_NATIVE_DEPTHS");
+    wcscpy(pipelineDescription.name, L"CACAO-PREPARE_NATIVE_DEPTHS");
     createCacaoPipeline(context, pipelineDescription, &context->pipelinePrepareNativeDepths, FFX_CACAO_PASS_PREPARE_NATIVE_DEPTHS, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-PREPARE_DOWNSAMPLED_DEPTHS_AND_MIPS");
+    wcscpy(pipelineDescription.name, L"CACAO-PREPARE_DOWNSAMPLED_DEPTHS_AND_MIPS");
     createCacaoPipeline(context, pipelineDescription, &context->pipelinePrepareDownsampledDepthsAndMips, FFX_CACAO_PASS_PREPARE_DOWNSAMPLED_DEPTHS_AND_MIPS, false, canForceWave64);
 
     createCacaoPipeline(context, pipelineDescription, &context->pipelinePrepareNativeDepthsAndMips, FFX_CACAO_PASS_PREPARE_NATIVE_DEPTHS_AND_MIPS, false, canForceWave64);
-    wcscpy_s(pipelineDescription.name, L"CACAO-PREPARE_NATIVE_DEPTHS_AND_MIPS");
+    wcscpy(pipelineDescription.name, L"CACAO-PREPARE_NATIVE_DEPTHS_AND_MIPS");
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-PREPARE_DOWNSAMPLED_DEPTHS_HALF");
+    wcscpy(pipelineDescription.name, L"CACAO-PREPARE_DOWNSAMPLED_DEPTHS_HALF");
     createCacaoPipeline(context, pipelineDescription, &context->pipelinePrepareDownsampledDepthsHalf, FFX_CACAO_PASS_PREPARE_DOWNSAMPLED_DEPTHS_HALF, supportedFP16, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-PREPARE_NATIVE_DEPTHS_HALF");
+    wcscpy(pipelineDescription.name, L"CACAO-PREPARE_NATIVE_DEPTHS_HALF");
     createCacaoPipeline(context, pipelineDescription,  &context->pipelinePrepareNativeDepthsHalf, FFX_CACAO_PASS_PREPARE_NATIVE_DEPTHS_HALF, supportedFP16, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-PREPARE_DOWNSAMPLED_NORMALS");
+    wcscpy(pipelineDescription.name, L"CACAO-PREPARE_DOWNSAMPLED_NORMALS");
     createCacaoPipeline(context, pipelineDescription, &context->pipelinePrepareDownsampledNormals, FFX_CACAO_PASS_PREPARE_DOWNSAMPLED_NORMALS, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-PREPARE_NATIVE_NORMALS");
+    wcscpy(pipelineDescription.name, L"CACAO-PREPARE_NATIVE_NORMALS");
     createCacaoPipeline(context, pipelineDescription, &context->pipelinePrepareNativeNormals, FFX_CACAO_PASS_PREPARE_NATIVE_NORMALS, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-PREPARE_DOWNSAMPLED_NORMALS_FROM_INPUT_NORMALS");
+    wcscpy(pipelineDescription.name, L"CACAO-PREPARE_DOWNSAMPLED_NORMALS_FROM_INPUT_NORMALS");
     createCacaoPipeline(context, pipelineDescription, &context->pipelinePrepareDownsampledNormalsFromInputNormals, FFX_CACAO_PASS_PREPARE_DOWNSAMPLED_NORMALS_FROM_INPUT_NORMALS, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-PREPARE_NATIVE_NORMALS_FROM_INPUT_NORMALS");
+    wcscpy(pipelineDescription.name, L"CACAO-PREPARE_NATIVE_NORMALS_FROM_INPUT_NORMALS");
     createCacaoPipeline(context, pipelineDescription, &context->pipelinePrepareNativeNormalsFromInputNormals, FFX_CACAO_PASS_PREPARE_NATIVE_NORMALS_FROM_INPUT_NORMALS, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-GENERATE_Q0");
+    wcscpy(pipelineDescription.name, L"CACAO-GENERATE_Q0");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineGenerateQ[0], FFX_CACAO_PASS_GENERATE_Q0, false, canForceWave64);
     
-    wcscpy_s(pipelineDescription.name, L"CACAO-GENERATE_Q1");
+    wcscpy(pipelineDescription.name, L"CACAO-GENERATE_Q1");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineGenerateQ[1], FFX_CACAO_PASS_GENERATE_Q1, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-GENERATE_Q2");
+    wcscpy(pipelineDescription.name, L"CACAO-GENERATE_Q2");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineGenerateQ[2], FFX_CACAO_PASS_GENERATE_Q2, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-GENERATE_Q3");
+    wcscpy(pipelineDescription.name, L"CACAO-GENERATE_Q3");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineGenerateQ[3], FFX_CACAO_PASS_GENERATE_Q3, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-GENERATE_Q3_BASE");
+    wcscpy(pipelineDescription.name, L"CACAO-GENERATE_Q3_BASE");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineGenerateQ[4], FFX_CACAO_PASS_GENERATE_Q3_BASE, false, canForceWave64);
     
-    wcscpy_s(pipelineDescription.name, L"CACAO-GENERATE_IMPORTANCE_MAP");
+    wcscpy(pipelineDescription.name, L"CACAO-GENERATE_IMPORTANCE_MAP");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineGenerateImportanceMap, FFX_CACAO_PASS_GENERATE_IMPORTANCE_MAP, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-POST_PROCESS_IMPORTANCE_MAP_A");
+    wcscpy(pipelineDescription.name, L"CACAO-POST_PROCESS_IMPORTANCE_MAP_A");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineProcessImportanceMapA, FFX_CACAO_PASS_POST_PROCESS_IMPORTANCE_MAP_A, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-POST_PROCESS_IMPORTANCE_MAP_B");
+    wcscpy(pipelineDescription.name, L"CACAO-POST_PROCESS_IMPORTANCE_MAP_B");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineProcessImportanceMapB, FFX_CACAO_PASS_POST_PROCESS_IMPORTANCE_MAP_B, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_1");
+    wcscpy(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_1");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineEdgeSensitiveBlur[0], FFX_CACAO_PASS_EDGE_SENSITIVE_BLUR_1, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_2");
+    wcscpy(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_2");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineEdgeSensitiveBlur[1], FFX_CACAO_PASS_EDGE_SENSITIVE_BLUR_2, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_3");
+    wcscpy(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_3");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineEdgeSensitiveBlur[2], FFX_CACAO_PASS_EDGE_SENSITIVE_BLUR_3, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_4");
+    wcscpy(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_4");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineEdgeSensitiveBlur[3], FFX_CACAO_PASS_EDGE_SENSITIVE_BLUR_4, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_5");
+    wcscpy(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_5");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineEdgeSensitiveBlur[4], FFX_CACAO_PASS_EDGE_SENSITIVE_BLUR_5, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_6");
+    wcscpy(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_6");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineEdgeSensitiveBlur[5], FFX_CACAO_PASS_EDGE_SENSITIVE_BLUR_6, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_7");
+    wcscpy(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_7");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineEdgeSensitiveBlur[6], FFX_CACAO_PASS_EDGE_SENSITIVE_BLUR_7, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_8");
+    wcscpy(pipelineDescription.name, L"CACAO-EDGE_SENSITIVE_BLUR_8");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineEdgeSensitiveBlur[7], FFX_CACAO_PASS_EDGE_SENSITIVE_BLUR_8, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-APPLY_NON_SMART_HALF");
+    wcscpy(pipelineDescription.name, L"CACAO-APPLY_NON_SMART_HALF");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineApplyNonSmartHalf, FFX_CACAO_PASS_APPLY_NON_SMART_HALF, supportedFP16, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-APPLY_NON_SMART");
+    wcscpy(pipelineDescription.name, L"CACAO-APPLY_NON_SMART");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineApplyNonSmart, FFX_CACAO_PASS_APPLY_NON_SMART, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-APPLY");
+    wcscpy(pipelineDescription.name, L"CACAO-APPLY");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineApply, FFX_CACAO_PASS_APPLY, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-UPSCALE_BILATERAL_5X5_HALF");
+    wcscpy(pipelineDescription.name, L"CACAO-UPSCALE_BILATERAL_5X5_HALF");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineUpscaleBilateral5x5Half, FFX_CACAO_PASS_UPSCALE_BILATERAL_5X5, supportedFP16, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-UPSCALE_BILATERAL_5X5_NON_SMART");
+    wcscpy(pipelineDescription.name, L"CACAO-UPSCALE_BILATERAL_5X5_NON_SMART");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineUpscaleBilateral5x5NonSmart, FFX_CACAO_PASS_UPSCALE_BILATERAL_5X5, false, canForceWave64);
 
-    wcscpy_s(pipelineDescription.name, L"CACAO-UPSCALE_BILATERAL_5X5_SMART");
+    wcscpy(pipelineDescription.name, L"CACAO-UPSCALE_BILATERAL_5X5_SMART");
     createCacaoPipeline(context, pipelineDescription, &context->pipelineUpscaleBilateral5x5Smart, FFX_CACAO_PASS_UPSCALE_BILATERAL_5X5, false, canForceWave64, true);
 
     return FFX_OK;
@@ -834,7 +834,7 @@ static void scheduleDispatch(
     FfxCacaoContext_Private* context, const FfxPipelineState* pipeline, const uint32_t dispatchX, const uint32_t dispatchY, const uint32_t dispatchZ, const uint32_t flags = 0)
 {
     FfxGpuJobDescription dispatchJob = {FFX_GPU_JOB_COMPUTE};
-    wcscpy_s(dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
     const size_t size                      = sizeof(dispatchJob);
 
     for (uint32_t currentShaderResourceViewIndex = 0; currentShaderResourceViewIndex < pipeline->srvTextureCount; ++currentShaderResourceViewIndex)
@@ -849,7 +849,7 @@ static void scheduleDispatch(
 
         dispatchJob.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(dispatchJob.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].name,
+        wcscpy(dispatchJob.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].name,
                  pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
@@ -860,7 +860,7 @@ static void scheduleDispatch(
         uint32_t       bindEntry         = pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].arrayIndex;
         const uint32_t currentResourceId = pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].resourceIdentifier;
 #ifdef FFX_DEBUG
-        wcscpy_s(dispatchJob.computeJobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name,
+        wcscpy(dispatchJob.computeJobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name,
                  pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
 #endif
         if (currentResourceId == FFX_CACAO_RESOURCE_IDENTIFIER_DOWNSAMPLED_DEPTH_MIPMAP_0)
@@ -891,7 +891,7 @@ static void scheduleDispatch(
     dispatchJob.computeJobDescriptor.pipeline      = *pipeline;
 
 #ifdef FFX_DEBUG
-    wcscpy_s(dispatchJob.computeJobDescriptor.cbNames[0], pipeline->constantBufferBindings[0].name);
+    wcscpy(dispatchJob.computeJobDescriptor.cbNames[0], pipeline->constantBufferBindings[0].name);
 #endif
     dispatchJob.computeJobDescriptor.cbs[0] = context->constantBuffer;
 
@@ -938,7 +938,7 @@ static FfxErrorCode cacaoDispatch(FfxCacaoContext_Private* context,
     // clear load counter
     {
         FfxGpuJobDescription clearJob      = {FFX_GPU_JOB_CLEAR_FLOAT};
-        wcscpy_s(clearJob.jobLabel, L"Clear Load Counter");
+        wcscpy(clearJob.jobLabel, L"Clear Load Counter");
         uint32_t             clearValues[] = {0, 0, 0, 0};
         memcpy(clearJob.clearJobDescriptor.color, clearValues, sizeof(uint32_t) * FFX_CACAO_ARRAY_SIZE(clearJob.clearJobDescriptor.color));
         clearJob.clearJobDescriptor.target = context->textures[FFX_CACAO_RESOURCE_IDENTIFIER_LOAD_COUNTER_BUFFER];

@@ -72,13 +72,16 @@ The FidelityFX SDK includes:
 
 <h2>Linux Notes</h2>
 Linux support has been added by DethRaid (me). I've made the following changes to get this to work:
-- `sdk/toolchain.cmake` does not set the `CMAKE_GENERATOR_PLATFORM` variable if we're building the VK or D3D12 backend on anything except Windows
-- If CMAKE_GENERATOR_PLATFORM is not set, `sdk/CMakeLists.txt` sets `FFX_PLATFORM_NAME` to `x64`
-- I've removed the `_s` functions throughout the code base. While versions of these are available in C11, my system (Manjaro Linux with Clang 20.8.1) does not support them
-- I've changed usage of `_countof` to `std::extent_v<decltype(variable)>` for better cross-platform compatibility
-- I've increased the sizes of many of the context structs to account for the size of the private data (it's bigger for some reason?)
-- I added an include for `math.h` in `ffx_core_cpu.h`
-- Added some explicit casts to `uint32_t`
+<ul>
+<li>>`sdk/toolchain.cmake` does not set the `CMAKE_GENERATOR_PLATFORM` variable if we're building the VK or D3D12 backend on anything except Windows</li>
+<li>>If CMAKE_GENERATOR_PLATFORM is not set, `sdk/CMakeLists.txt` sets `FFX_PLATFORM_NAME` to `x64`</li>
+<li>>I've removed the `_s` functions throughout the code base. While versions of these are available in C11, my system (Manjaro Linux with Clang 20.8.1) does not support them</li>
+<li>>I've changed usage of `_countof` to `std::extent_v<decltype(variable)>` for better cross-platform compatibility</li>
+<li>>I've increased the sizes of many of the context structs to account for the size of the private data (it's bigger for some reason?)</li>
+<li>>I added an include for `math.h` in `ffx_core_cpu.h`</li>
+<li>>Added some explicit casts to `uint32_t`</li>
+<li>>I have made so many changes to the shader compilation. yalls have no idea (i guess you can get an idea by checking the git history). I've added excape characters to the shader permutations to get around bash command expansion, I've fixed up the cmake files so they don't create dummy targets that don't exist and also don't double-add shaders, I've rewritten a lot of the shader compiler program to not be married to windows, like at all. At least half my time on this project has been spent just reworking shader compilation</li>
+</ul>
 
 <h2>Open source</h2>
 

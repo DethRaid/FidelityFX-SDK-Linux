@@ -33,6 +33,9 @@
 #include <codecvt>  // this is deprecated so it's just a fallback solution
 #endif  // _WIN32
 
+#include <cmath>
+#include <cstring>
+#include <locale>
 #include <vulkan/vulkan.h>
 
 // prototypes for functions in the interface
@@ -1121,13 +1124,13 @@ void ConvertUTF8ToUTF16(const char* inputName, wchar_t* outputBuffer, size_t out
 {
     memset(outputBuffer, 0, outputLen * sizeof(wchar_t));
     std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-    wcscpy_s(outputBuffer, outputLen, converter.from_bytes(inputName).c_str());
+    wcscpy(outputBuffer, converter.from_bytes(inputName).c_str());
 }
 void ConvertUTF16ToUTF8(const wchar_t* inputName, char* outputBuffer, size_t outputLen)
 {
     memset(outputBuffer, 0, outputLen * sizeof(char));
     std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-    strcpy_s(outputBuffer, outputLen, converter.to_bytes(inputName).c_str());
+    strcpy(outputBuffer, converter.to_bytes(inputName).c_str());
 }
 #endif  // _WIN32
 
@@ -3650,7 +3653,7 @@ FfxErrorCode CreatePipelineVK(FfxInterface* backendInterface,
     outPipeline->pipeline = reinterpret_cast<FfxPipeline>(computePipeline);
 
     // Setup the pipeline name
-    wcscpy_s(outPipeline->name, pipelineDescription->name);
+    wcscpy(outPipeline->name, pipelineDescription->name);
 
     return FFX_OK;
 }

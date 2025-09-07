@@ -415,17 +415,7 @@ void Application::Process()
 
 std::wstring Application::MakeFullPath(const std::wstring & outputPath, const std::wstring & fileName)
 {
-    // Append file name, optionally converting to long path again, because the outputPath alone could be normal path, but when filename is added -- it could become a long path
-    PWSTR canonicalFileNameRaw = NULL;
-    HRESULT hr = PathAllocCombine(outputPath.c_str(), fileName.c_str(), PATHCCH_ALLOW_LONG_PATHS, &canonicalFileNameRaw);
-
-    if (S_OK == hr)
-    {
-        std::wstring canonicalFileName(canonicalFileNameRaw);
-        LocalFree(canonicalFileNameRaw);
-        return canonicalFileName;
-    }
-    return fileName;
+    return (std::filesystem::path{outputPath} / std::filesystem::path{fileName}).wstring();
 }
 
 void Application::GenerateMacroPermutations(std::deque<Permutation>& permutations)
@@ -535,32 +525,40 @@ void Application::OpenSourceFile()
         size_t       extensionPos = m_Params.inputFile.find_last_of('.');
         std::wstring extension    = m_Params.inputFile.substr(extensionPos + 1, m_Params.inputFile.size() - extensionPos - 1);
 
-        if (extension == L"hlsl")
-            m_Compiler = std::unique_ptr<HLSLCompiler>(
-                new HLSLCompiler(HLSLCompiler::DXC, dxcDll, shaderPath, shaderName, shaderFileName, outputPath, m_Params.disableLogs, m_Params.debugCompile));
-        else if (extension == L"glsl")
-            m_Compiler = std::unique_ptr<GLSLCompiler>(new GLSLCompiler(glslangExe, shaderPath, shaderName, shaderFileName, outputPath, m_Params.disableLogs, m_Params.debugCompile));
-        else
+#ifdef _WIN32
+        if (extension == L"hlsl") {
+            m_Compiler = std::make_unique<HLSLCompiler>(HLSLCompiler::DXC, dxcDll, shaderPath, shaderName, shaderFileName, outputPath, m_Params.disableLogs, m_Params.debugCompile);
+        } else
+#endif
+        if (extension == L"glsl") {
+            m_Compiler = std::make_unique<GLSLCompiler>(glslangExe, shaderPath, shaderName, shaderFileName, outputPath, m_Params.disableLogs, m_Params.debugCompile);
+        } else {
             throw std::runtime_error("Unknown shader source file extension. Please use the -compiler option to specify which compiler to use.");
+        }
     }
     else
     {
-        if (m_Params.compiler == L"dxc")
-            m_Compiler = std::unique_ptr<HLSLCompiler>(
+#ifdef _WIN32
+        if (m_Params.compiler == L"dxc") {
+            m_Compiler = std::make_unique<HLSLCompiler>(
                 new HLSLCompiler(HLSLCompiler::DXC, dxcDll, shaderPath, shaderName, shaderFileName, outputPath, m_Params.disableLogs, m_Params.debugCompile));
-        else if (m_Params.compiler == L"gdk.scarlett.x64")
-            m_Compiler = std::unique_ptr<HLSLCompiler>(new HLSLCompiler(
+        } else if (m_Params.compiler == L"gdk.scarlett.x64") {
+            m_Compiler = std::make_unique<HLSLCompiler>(new HLSLCompiler(
                 HLSLCompiler::GDK_SCARLETT_X64, dxcDll, shaderPath, shaderName, shaderFileName, outputPath, m_Params.disableLogs, m_Params.debugCompile));
-        else if (m_Params.compiler == L"gdk.xboxone.x64")
-            m_Compiler = std::unique_ptr<HLSLCompiler>(new HLSLCompiler(
+        } else if (m_Params.compiler == L"gdk.xboxone.x64") {
+            m_Compiler = std::make_unique<HLSLCompiler>(new HLSLCompiler(
                 HLSLCompiler::GDK_XBOXONE_X64, dxcDll, shaderPath, shaderName, shaderFileName, outputPath, m_Params.disableLogs, m_Params.debugCompile));
-        else if (m_Params.compiler == L"fxc")
-            m_Compiler = std::unique_ptr<HLSLCompiler>(
+        } else if (m_Params.compiler == L"fxc") {
+            m_Compiler = std::make_unique<HLSLCompiler>(
                 new HLSLCompiler(HLSLCompiler::FXC, d3dDll, shaderPath, shaderName, shaderFileName, outputPath, m_Params.disableLogs, m_Params.debugCompile));
-        else if (m_Params.compiler == L"glslang")
-            m_Compiler = std::unique_ptr<GLSLCompiler>(new GLSLCompiler(glslangExe, shaderPath, shaderName, shaderFileName, outputPath, m_Params.disableLogs, m_Params.debugCompile));
-        else
-            throw std::runtime_error("Unknown compiler requested (valid options: dxc, fxc or glslang)");
+        } else
+#endif
+        if (m_Params.compiler == L"glslang") {
+            m_Compiler = std::make_unique<GLSLCompiler>(glslangExe, shaderPath, shaderName, shaderFileName, outputPath,
+                                                        m_Params.disableLogs, m_Params.debugCompile);
+        } else {
+            throw std::runtime_error("Unknown compiler requested (valid options: dxc, fxc or glslang) (but dxc and fxc are only valid on windows)");
+        }
     }
 
     std::vector<fs::path> includeSearchPaths{};

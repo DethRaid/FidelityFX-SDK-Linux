@@ -236,7 +236,7 @@ bool GLSLCompiler::GLSLCompiler::Compile(Permutation& permutation, const std::ve
 
         while (std::getline(ss, token, '\n'))
         {
-            if (token != "\r") // avoid carriage return
+            if (!token.empty() && token != "\r") // avoid carriage return
             {
                 // parse file / line info
                 int lineNumber = -1;
@@ -257,12 +257,17 @@ bool GLSLCompiler::GLSLCompiler::Compile(Permutation& permutation, const std::ve
                         token.erase(0, end + 2);
                     }
                 }
+#ifdef _WIN32
                 token.pop_back();
+#endif
                 errors.push_back(ErrorData{token, lineNumber});
             }
         }
     };
 
+#ifndef NDEBUG
+    fprintf(stdout, "%s\n", cmdLine.c_str());
+#endif
     tpl::Process process(cmdLine, "", func, func);
 
     bool succeeded = process.get_exit_status() == 0;

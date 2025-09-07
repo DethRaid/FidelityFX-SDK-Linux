@@ -300,7 +300,7 @@ void LaunchParameters::ParseCommandLine(int argCount, const wchar_t* const* args
             debugCompile = true;
         } else if (args[i][0] == L'-')
         {
-            compilerArgs.push_back(args[i++]);
+            compilerArgs.emplace_back(args[i++]);
 
             // Attempt to parse the next arguments in case there are some parameters for the compiler args.
             for (; i < argCount; i++)

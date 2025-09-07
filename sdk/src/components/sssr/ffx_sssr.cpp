@@ -23,6 +23,7 @@
 #include <string.h>     // for memset
 #include <math.h>       // for ceil, log2
 #include <algorithm>    // for max
+#include <cwchar>
 using namespace std;
 
 #include <FidelityFX/host/ffx_sssr.h>
@@ -207,22 +208,22 @@ static FfxErrorCode createPipelineStates(FfxSssrContext_Private* context)
     uint32_t contextFlags = context->contextDescription.flags;
 
     // Set up pipeline descriptor (basically RootSignature and binding)
-    wcscpy_s(pipelineDescription.name, L"SSSR-DEPTH_DOWNSAMPLE");
+    wcscpy(pipelineDescription.name, L"SSSR-DEPTH_DOWNSAMPLE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_SSSR, FFX_SSSR_PASS_DEPTH_DOWNSAMPLE,
         getPipelinePermutationFlags(contextFlags, FFX_SSSR_PASS_DEPTH_DOWNSAMPLE, supportedFP16, false), &pipelineDescription, context->effectContextId, &context->pipelineDepthDownsample ));
-    wcscpy_s(pipelineDescription.name, L"SSSR-CLASSIFY_TILES");
+    wcscpy(pipelineDescription.name, L"SSSR-CLASSIFY_TILES");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_SSSR, FFX_SSSR_PASS_CLASSIFY_TILES,
         getPipelinePermutationFlags(contextFlags, FFX_SSSR_PASS_CLASSIFY_TILES, supportedFP16, canForceWave64), &pipelineDescription, context->effectContextId, &context->pipelineClassifyTiles));
-    wcscpy_s(pipelineDescription.name, L"SSSR-PREPARE_BLUE_NOISE_TEXTURE");
+    wcscpy(pipelineDescription.name, L"SSSR-PREPARE_BLUE_NOISE_TEXTURE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_SSSR, FFX_SSSR_PASS_PREPARE_BLUE_NOISE_TEXTURE, 
         getPipelinePermutationFlags(contextFlags, FFX_SSSR_PASS_PREPARE_BLUE_NOISE_TEXTURE, supportedFP16, canForceWave64), &pipelineDescription, context->effectContextId, &context->pipelinePrepareBlueNoiseTexture));
-    wcscpy_s(pipelineDescription.name, L"SSSR-PREPARE_INDIRECT_ARGS");
+    wcscpy(pipelineDescription.name, L"SSSR-PREPARE_INDIRECT_ARGS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_SSSR, FFX_SSSR_PASS_PREPARE_INDIRECT_ARGS, 
         getPipelinePermutationFlags(contextFlags, FFX_SSSR_PASS_PREPARE_INDIRECT_ARGS, supportedFP16, canForceWave64), &pipelineDescription, context->effectContextId, &context->pipelinePrepareIndirectArgs));
     
     // Indirect workloads
     pipelineDescription.indirectWorkload = 1;
-    wcscpy_s(pipelineDescription.name, L"SSSR-INTERSECTION");
+    wcscpy(pipelineDescription.name, L"SSSR-INTERSECTION");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_SSSR, FFX_SSSR_PASS_INTERSECTION, 
         getPipelinePermutationFlags(contextFlags ,FFX_SSSR_PASS_INTERSECTION, supportedFP16, canForceWave64), &pipelineDescription, context->effectContextId, &context->pipelineIntersection));
 
@@ -287,7 +288,7 @@ static FfxErrorCode sssrCreate(FfxSssrContext_Private* context, const FfxSssrCon
          FFX_RESOURCE_TYPE_BUFFER,
          FFX_RESOURCE_USAGE_UAV,
          FFX_SURFACE_FORMAT_R32_UINT,
-         numPixels * sizeof(uint32_t),
+         static_cast<uint32_t>(numPixels * sizeof(uint32_t)),
          sizeof(uint32_t),
          1,
          FFX_RESOURCE_FLAGS_NONE,
@@ -298,7 +299,7 @@ static FfxErrorCode sssrCreate(FfxSssrContext_Private* context, const FfxSssrCon
          FFX_RESOURCE_TYPE_BUFFER,
          FFX_RESOURCE_USAGE_UAV,
          FFX_SURFACE_FORMAT_R32_UINT,
-         numPixels * sizeof(uint32_t),
+         static_cast<uint32_t>(numPixels * sizeof(uint32_t)),
          sizeof(uint32_t),
          1,
          FFX_RESOURCE_FLAGS_NONE,
@@ -521,14 +522,14 @@ static void populateComputeJobResources(FfxSssrContext_Private* context, const F
         const FfxResourceInternal currentResource = context->srvResources[currentResourceId];
         jobDescriptor->srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor->srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor->srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
 
     uint32_t uavEntry = 0;  // Uav resource offset (accounts for uav arrays)
     for (uint32_t currentUnorderedAccessViewIndex = 0; currentUnorderedAccessViewIndex < pipeline->uavTextureCount; ++currentUnorderedAccessViewIndex) {
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor->uavTextures[currentUnorderedAccessViewIndex].name, pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy(jobDescriptor->uavTextures[currentUnorderedAccessViewIndex].name, pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
 #endif
         const uint32_t bindEntry = pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].arrayIndex;
         const uint32_t currentResourceId = pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].resourceIdentifier;
@@ -547,13 +548,13 @@ static void populateComputeJobResources(FfxSssrContext_Private* context, const F
         const FfxResourceInternal currentResource = context->uavResources[currentResourceId];
         jobDescriptor->uavBuffers[currentUnorderedAccessViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor->uavBuffers[currentUnorderedAccessViewIndex].name, pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy(jobDescriptor->uavBuffers[currentUnorderedAccessViewIndex].name, pipeline->uavBufferBindings[currentUnorderedAccessViewIndex].name);
 #endif
     }
 
     for (uint32_t currentRootConstantIndex = 0; currentRootConstantIndex < pipeline->constCount; ++currentRootConstantIndex) {
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor->cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
+        wcscpy(jobDescriptor->cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
 #endif
         jobDescriptor->cbs[currentRootConstantIndex] = context->constantBuffers[pipeline->constantBufferBindings[currentRootConstantIndex].resourceIdentifier];
     }
@@ -568,7 +569,7 @@ static void scheduleIndirectDispatch(FfxSssrContext_Private* context, const FfxP
     populateComputeJobResources(context , pipeline, &jobDescriptor);
 
     FfxGpuJobDescription dispatchJob = { FFX_GPU_JOB_COMPUTE };
-    wcscpy_s(dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
     dispatchJob.computeJobDescriptor = jobDescriptor;
     context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &dispatchJob);
 }
@@ -576,7 +577,7 @@ static void scheduleIndirectDispatch(FfxSssrContext_Private* context, const FfxP
 static void scheduleDispatch(FfxSssrContext_Private* context, const FfxPipelineState* pipeline, uint32_t dispatchX, uint32_t dispatchY)
 {
     FfxGpuJobDescription dispatchJob = {FFX_GPU_JOB_COMPUTE};
-    wcscpy_s(dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
     dispatchJob.computeJobDescriptor.dimensions[0] = dispatchX;
     dispatchJob.computeJobDescriptor.dimensions[1] = dispatchY;
     dispatchJob.computeJobDescriptor.dimensions[2] = 1;
@@ -603,7 +604,7 @@ static FfxErrorCode sssrDispatch(FfxSssrContext_Private* context, const FfxSssrD
     if (context->constants.frameIndex == 0) {
         FfxGpuJobDescription job = {};
         job.jobType = FFX_GPU_JOB_CLEAR_FLOAT;
-        wcscpy_s(job.jobLabel, L"Zero initialize resource");
+        wcscpy(job.jobLabel, L"Zero initialize resource");
         job.clearJobDescriptor.color[0] = 0.0f;
         job.clearJobDescriptor.color[1] = 0.0f;
         job.clearJobDescriptor.color[2] = 0.0f;

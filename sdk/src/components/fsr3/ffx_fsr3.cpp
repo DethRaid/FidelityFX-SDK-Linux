@@ -32,6 +32,7 @@
 #pragma clang diagnostic ignored "-Wsign-compare"
 #endif
 
+#include <cwchar>
 #include <FidelityFX/gpu/ffx_core.h>
 #include <FidelityFX/gpu/fsr3/ffx_fsr3_resources.h>
 #include <ffx_object_management.h>

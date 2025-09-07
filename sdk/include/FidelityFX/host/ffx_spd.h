@@ -57,7 +57,11 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup FfxSpd
+#ifdef __clang__
+#define FFX_SPD_CONTEXT_SIZE       (70200 / 4)
+#else
 #define FFX_SPD_CONTEXT_SIZE       (9300)
+#endif
 
 /// If this ever changes, need to also reflect a change in number
 /// of resources in ffx_spd_resources.h

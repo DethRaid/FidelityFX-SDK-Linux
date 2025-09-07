@@ -170,7 +170,14 @@ if(FFX_VS_VERSION STREQUAL 2015 OR FFX_VS_VERSION STREQUAL 2017)
 endif()
 
 # Setup common variables
+if(WIN32)
 set(FFX_SC_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/tools/binary_store/FidelityFX_SC.exe)
+elseif(LINUX)
+set(FFX_SC_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/tools/binary_store/FidelityFX_SC)
+else()
+message(FATAL_ERROR "shader compilation is only supported on windows and linux sorry")
+endif()
+
 set(FFX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(FFX_LIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 set(FFX_BIN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/ffx_sdk)

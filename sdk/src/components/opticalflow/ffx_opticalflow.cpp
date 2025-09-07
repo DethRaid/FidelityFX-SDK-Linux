@@ -39,6 +39,8 @@
 
 #define FFX_OPTICALFLOW_MAX_QUEUED_FRAMES 16
 
+#include <cstring>
+
 #include "ffx_opticalflow_private.h"
 
 typedef struct Binding
@@ -107,13 +109,13 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvIndex = 0; srvIndex < inoutPipeline->srvTextureCount; ++srvIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(srvBindingNames); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(srvBindingNames)>; ++mapIndex)
         {
             if (0 == wcscmp(srvBindingNames[mapIndex].name, inoutPipeline->srvTextureBindings[srvIndex].name))
                 break;
         }
-        FFX_ASSERT(mapIndex < _countof(srvBindingNames));
-        if (mapIndex == _countof(srvBindingNames))
+        FFX_ASSERT(mapIndex < std::extent_v<decltype(srvBindingNames)>);
+        if (mapIndex == std::extent_v<decltype(srvBindingNames)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvTextureBindings[srvIndex].resourceIdentifier = srvBindingNames[mapIndex].index;
@@ -122,13 +124,13 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavTextureCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavBindingNames); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(uavBindingNames)>; ++mapIndex)
         {
             if (0 == wcscmp(uavBindingNames[mapIndex].name, inoutPipeline->uavTextureBindings[uavIndex].name))
                 break;
         }
-        FFX_ASSERT(mapIndex < _countof(uavBindingNames));
-        if (mapIndex == _countof(uavBindingNames))
+        FFX_ASSERT(mapIndex < std::extent_v<decltype(uavBindingNames)>);
+        if (mapIndex == std::extent_v<decltype(uavBindingNames)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavTextureBindings[uavIndex].resourceIdentifier = uavBindingNames[mapIndex].index;
@@ -137,13 +139,13 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t cbIndex = 0; cbIndex < inoutPipeline->constCount; ++cbIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(cbBindingNames); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(cbBindingNames)>; ++mapIndex)
         {
             if (0 == wcscmp(cbBindingNames[mapIndex].name, inoutPipeline->constantBufferBindings[cbIndex].name))
                 break;
         }
-        FFX_ASSERT(mapIndex < _countof(cbBindingNames));
-        if (mapIndex == _countof(cbBindingNames))
+        FFX_ASSERT(mapIndex < std::extent_v<decltype(cbBindingNames)>);
+        if (mapIndex == std::extent_v<decltype(cbBindingNames)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->constantBufferBindings[cbIndex].resourceIdentifier = cbBindingNames[mapIndex].index;
@@ -202,7 +204,7 @@ static FfxErrorCode createPipelineStates(FfxOpticalflowContext_Private* context)
 
     auto CreateComputePipeline = [&](FfxPass pass, const wchar_t* name, FfxPipelineState* pipeline) -> FfxErrorCode {
         ffxSafeReleasePipeline(&context->contextDescription.backendInterface, pipeline, context->effectContextId);
-        wcscpy_s(pipelineDescription.name, name);
+        wcscpy(pipelineDescription.name, name);
         FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(
             &context->contextDescription.backendInterface,
             FFX_EFFECT_OPTICALFLOW,
@@ -472,7 +474,7 @@ static void scheduleDispatch(FfxOpticalflowContext_Private* context, const FfxPi
         const FfxResourceInternal currentResource = context->srvBindings[bindingIdentifier];
         jobDescriptor.srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
 
         FFX_ASSERT(bindingIdentifier != FFX_OF_BINDING_IDENTIFIER_NULL);
@@ -486,7 +488,7 @@ static void scheduleDispatch(FfxOpticalflowContext_Private* context, const FfxPi
         jobDescriptor.uavTextures[currentUnorderedAccessViewIndex].resource = currentResource;
         jobDescriptor.uavTextures[currentUnorderedAccessViewIndex].mip = 0;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name, pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy(jobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name, pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
 #endif
 
         FFX_ASSERT(bindingIdentifier != FFX_OF_BINDING_IDENTIFIER_NULL);
@@ -500,13 +502,13 @@ static void scheduleDispatch(FfxOpticalflowContext_Private* context, const FfxPi
 
     for (uint32_t currentRootConstantIndex = 0; currentRootConstantIndex < pipeline->constCount; ++currentRootConstantIndex) {
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
+        wcscpy(jobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
 #endif
         jobDescriptor.cbs[currentRootConstantIndex] = context->constantBuffers[pipeline->constantBufferBindings[currentRootConstantIndex].resourceIdentifier];
     }
 
     FfxGpuJobDescription dispatchJob = { FFX_GPU_JOB_COMPUTE };
-    wcscpy_s(dispatchJob.jobLabel, pipelineName);
+    wcscpy(dispatchJob.jobLabel, pipelineName);
     dispatchJob.computeJobDescriptor = jobDescriptor;
 
     context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &dispatchJob);
@@ -568,57 +570,57 @@ static FfxErrorCode dispatch(FfxOpticalflowContext_Private* context, const FfxOp
         FfxGpuJobDescription clearJob = { FFX_GPU_JOB_CLEAR_FLOAT };
         memcpy(clearJob.clearJobDescriptor.color, clearValuesToZeroFloat, 4 * sizeof(float));
 
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow SCD Temp");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow SCD Temp");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_SCD_TEMP];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
         clearJob.clearJobDescriptor.target = context->uavBindings[FFX_OF_BINDING_IDENTIFIER_SHARED_OPTICAL_FLOW_SCD_OUTPUT];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow SCD Histogram");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow SCD Histogram");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_SCD_HISTOGRAM];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow SCD Previous histogram");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow SCD Previous histogram");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_SCD_PREVIOUS_HISTOGRAM];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 1");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 1");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 1 Level 1");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 1 Level 1");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1_LEVEL_1];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 1 Level 2");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 1 Level 2");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1_LEVEL_2];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 1 Level 3");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 1 Level 3");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1_LEVEL_3];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 1 Level 4");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 1 Level 4");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1_LEVEL_4];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 1 Level 5");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 1 Level 5");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1_LEVEL_5];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 1 Level 6");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 1 Level 6");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1_LEVEL_6];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 2");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 2");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 2 Level 1");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 2 Level 1");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2_LEVEL_1];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 2 Level 2");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 2 Level 2");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2_LEVEL_2];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 2 Level 3");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 2 Level 3");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2_LEVEL_3];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 2 Level 4");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 2 Level 4");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2_LEVEL_4];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 2 Level 5");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 2 Level 5");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2_LEVEL_5];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Optical Flow Input 2 Level 6");
+        wcscpy(clearJob.jobLabel, L"Clear Optical Flow Input 2 Level 6");
         clearJob.clearJobDescriptor.target = context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2_LEVEL_6];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
     }
@@ -832,46 +834,46 @@ static FfxErrorCode dispatch(FfxOpticalflowContext_Private* context, const FfxOp
     {
         FfxGpuJobDescription barrierJob = {FFX_GPU_JOB_BARRIER};
 
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 1");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 1");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 1 Level 1");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 1 Level 1");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1_LEVEL_1], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 1 Level 2");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 1 Level 2");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1_LEVEL_2], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 1 Level 3");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 1 Level 3");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1_LEVEL_3], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 1 Level 4");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 1 Level 4");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1_LEVEL_4], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 1 Level 5");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 1 Level 5");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1_LEVEL_5], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 1 Level 6");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 1 Level 6");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_1_LEVEL_6], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 2");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 2");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 2 Level 1");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 2 Level 1");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2_LEVEL_1], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 2 Level 2");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 2 Level 2");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2_LEVEL_2], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 2 Level 3");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 2 Level 3");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2_LEVEL_3], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 2 Level 4");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 2 Level 4");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2_LEVEL_4], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 2 Level 5");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 2 Level 5");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2_LEVEL_5], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
-        wcscpy_s(barrierJob.jobLabel, L"Transition Optical Flow Input 2 Level 6");
+        wcscpy(barrierJob.jobLabel, L"Transition Optical Flow Input 2 Level 6");
         barrierJob.barrierDescriptor = { context->resources[FFX_OF_RESOURCE_IDENTIFIER_OPTICAL_FLOW_INPUT_2_LEVEL_6], FFX_BARRIER_TYPE_TRANSITION, FFX_RESOURCE_STATE_COMPUTE_READ, FFX_RESOURCE_STATE_UNORDERED_ACCESS, 0};
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &barrierJob);
     }

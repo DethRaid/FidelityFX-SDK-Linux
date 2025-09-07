@@ -1,5 +1,9 @@
 <h1>THIS IS AN UNOFFICIAL FORK</h1>
 
+This is my fork of FidelityFX that adds in Linux support. Almost all FidelityFX features should work - frame interpolation is the one exception. I did not want to rewrite the swapchain class, sorry. If you really care about that, a PR is welcome. Check out `sdk/src/backends/vk/FrameInterpolationSwapchain` to get started
+
+I'm testing this in my current game and not using all features. It's highly likely I've missed some issues when testing. Please open an Issue with any problems you find
+
 <h1>Welcome to the AMD FidelityFX™ SDK 1.1.4</h1>
 
 ![alt text](/docs/media/fidelityfxsdk-logo-rescaled.png)
@@ -23,7 +27,7 @@ The FidelityFX SDK includes:
 | [Super Resolution Upscaling and Frame Generation](/docs/techniques/super-resolution-interpolation.md) 3.1.4 | [Super Resolution sample](/docs/samples/super-resolution.md) | [FidelityFX Super Resolution 3](https://gpuopen.com/fidelityfx-superresolution-3/) | Offers generation of interpolated frames in combination with our temporal upscaler for producing high resolution frames from lower resolution inputs. |
 | [Super Resolution (Upscaler)](/docs/techniques/super-resolution-upscaler.md) 3.1.4 | [Super Resolution sample](/docs.samples/super-resolution.md) | [FidelityFX Super Resolution 3](https://gpuopen.com/fidelityfx-superresolution-3/) | Offers a temporal (multi-frame accumulation) solution for producing high resolution frames from lower resolution inputs. |
 | [Frame Interpolation](techniques/frame-interpolation.md) 1.1.3 | [Super Resolution sample](/docs/samples/super-resolution.md) | [FidelityFX Super Resolution 3](https://gpuopen.com/fidelityfx-superresolution-3/) | Offers generation of interpolated frames from multiple real input frames, and multiple sources of motion vector data. |
-| [Frame Interpolation SwapChain](/docs/techniques/frame-interpolation-swap-chain.md) 1.1.3 | [Super Resolution sample](/docs/samples/super-resolution.md) | [FidelityFX Super Resolution 3](https://gpuopen.com/fidelityfx-superresolution-3/) | A replacement DXGI Swapchain implementation for DX12 which allows for additional frames to be presented along with real game frames, with relevant frame pacing. |
+| [Frame Interpolation SwapChain](/docs/techniques/frame-interpolation-swap-chain.md) 1.1.3 | [Super Resolution sample](/docs/samples/super-resolution.md) | [FidelityFX Super Resolution 3](https://gpuopen.com/fidelityfx-superresolution-3/) | A replacement DXGI Swapchain implementation for DX12 which allows for additional frames to be presented along with real game frames, with relevant frame pacing. NOT SUPPORTED ON LINUX |
 | [Optical Flow](/docs/techniques/optical-flow.md) 1.1.2 | [Super Resolution sample](/docs/samples/super-resolution.md) | [FidelityFX Super Resolution 3](https://gpuopen.com/fidelityfx-superresolution-3/) | Offers a motion-estimation algorithm which is useful for generating block-based motion vectors from temporal image inputs. |
 | [Variable Shading](/docs/techniques/variable-shading.md) 1.2 | [Variable Shading sample](/docs/samples/variable-shading.md) | [FidelityFX Variable Shading](https://gpuopen.com/fidelityfx-variable-shading/) | Helps you to drive Variable Rate Shading hardware introduced in RDNA2-based and contemporary GPUs, by analyzing the luminance of pixels in a tile to determine where the shading rate can be lowered to increase performance. |
 | [Blur](/docs/samples/blur.md) 1.1 | [Blur sample](/docs/samples/blur.md) | [FidelityFX Blur](https://gpuopen.com/fidelityfx-blur/) | A library of highly optimized functions which perform common blurring operations such as Gaussian blur, radial blurs, and others. |

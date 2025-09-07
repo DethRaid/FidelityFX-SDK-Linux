@@ -344,7 +344,9 @@ FfxErrorCode ffxGetInterfaceVK(
     backendInterface->fpBreadcrumbsWrite = BreadcrumbsWriteVK;
     backendInterface->fpBreadcrumbsPrintDeviceInfo = BreadcrumbsPrintDeviceInfoVK;
     backendInterface->fpRegisterConstantBufferAllocator = RegisterConstantBufferAllocatorVK;
+#ifdef _WIN32
     backendInterface->fpSwapChainConfigureFrameGeneration = ffxSetFrameGenerationConfigToSwapchainVK;
+#endif
 
     // Memory assignments
     backendInterface->scratchBuffer = scratchBuffer;

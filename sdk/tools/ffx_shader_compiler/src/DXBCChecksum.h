@@ -80,6 +80,6 @@
 /// \param[in] dwSize   The size of the memory to checksum.
 /// \param[out] dwHash  A DWORD array to copy the calculated check sum into.
 /// \return TRUE if successful, otherwise FALSE.
-BOOL CalculateDXBCChecksum(BYTE* pData, DWORD dwSize, DWORD dwHash[4]);
+int CalculateDXBCChecksum(unsigned char* pData, unsigned long dwSize, unsigned long dwHash[4]);
 
 #endif // DXBCCHECKSUM_H

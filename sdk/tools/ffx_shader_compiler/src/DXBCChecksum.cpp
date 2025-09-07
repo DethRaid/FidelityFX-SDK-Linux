@@ -75,10 +75,11 @@
 **********************************************************************
 */
 
-#include <Windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "DXBCChecksum.h"
+
+#include <cstring>
 
 /* Padding */
 static unsigned char MD5_PADDING[64] =
@@ -250,7 +251,7 @@ void MD5Update(MD5_CTX* mdContext, unsigned char* inBuf, unsigned int inLen)
     int mdi = 0;
     unsigned int i = 0, ii = 0;
 
-    /* Compute number of bytes mod 64 */
+    /* Compute number of unsigned chars mod 64 */
     mdi = (int)((mdContext->i[0] >> 3) & 0x3F);
 
     /* Update number of bits */
@@ -289,14 +290,14 @@ void MD5Final(MD5_CTX* mdContext)
     unsigned int i = 0, ii = 0, padLen = 0;
 
     /* Save number of bits */
-    UINT numberOfBits = mdContext->i[0];
+    unsigned int numberOfBits = mdContext->i[0];
 
     /* Pad out to 56 mod 64 */
     padLen = (mdi < 56) ? (56 - mdi) : (120 - mdi);
 
     MD5Update(mdContext, (unsigned char*) &numberOfBits, 4);
 
-    /* Compute number of bytes mod 64 */
+    /* Compute number of unsigned chars mod 64 */
     mdi = (int)((mdContext->i[0] >> 3) & 0x3F);
 
     /* Pad out to 56 mod 64 */
@@ -327,9 +328,9 @@ void MD5Final(MD5_CTX* mdContext)
     }
 }
 
-static const DWORD dwHashOffset = 0x14;
+static const unsigned long dwHashOffset = 0x14;
 
-BOOL CalculateDXBCChecksum(BYTE* pData, DWORD dwSize, DWORD dwHash[4])
+int CalculateDXBCChecksum(unsigned char* pData, unsigned long dwSize, unsigned long dwHash[4])
 {
     MD5_CTX md5Ctx;
     MD5Init(&md5Ctx, 0);
@@ -338,15 +339,15 @@ BOOL CalculateDXBCChecksum(BYTE* pData, DWORD dwSize, DWORD dwHash[4])
     dwSize -= dwHashOffset;
     pData += dwHashOffset;
 
-    DWORD dwNumberOfBits = dwSize * 8;
+    unsigned long dwNumberOfBits = dwSize * 8;
 
     // First we hash all the full chunks available
-    DWORD dwFullChunksSize = dwSize & 0xffffffc0;
+    unsigned long dwFullChunksSize = dwSize & 0xffffffc0;
     MD5Update(&md5Ctx, pData, dwFullChunksSize);
 
-    DWORD dwLastChunkSize = dwSize - dwFullChunksSize;
-    DWORD dwPaddingSize = 64  - dwLastChunkSize;
-    BYTE* pLastChunkData = pData + dwFullChunksSize;
+    unsigned long dwLastChunkSize = dwSize - dwFullChunksSize;
+    unsigned long dwPaddingSize = 64  - dwLastChunkSize;
+    unsigned char* pLastChunkData = pData + dwFullChunksSize;
 
     if (dwLastChunkSize >= 56)
     {
@@ -375,8 +376,8 @@ BOOL CalculateDXBCChecksum(BYTE* pData, DWORD dwSize, DWORD dwHash[4])
 
 
         // Adjust for the space used for dwNumberOfBits
-        dwLastChunkSize += sizeof(DWORD);
-        dwPaddingSize -= sizeof(DWORD);
+        dwLastChunkSize += sizeof(unsigned long);
+        dwPaddingSize -= sizeof(unsigned long);
 
         /* Pad out to 56 mod 64 */
         memcpy(&md5Ctx.in[dwLastChunkSize], MD5_PADDING, dwPaddingSize);
@@ -389,7 +390,7 @@ BOOL CalculateDXBCChecksum(BYTE* pData, DWORD dwSize, DWORD dwHash[4])
         MD5_Transform(md5Ctx.buf, in);
     }
 
-    memcpy(dwHash, md5Ctx.buf, 4 * sizeof(DWORD));
+    memcpy(dwHash, md5Ctx.buf, 4 * sizeof(unsigned long));
 
-    return TRUE;
+    return true;
 }

@@ -25,8 +25,10 @@ cmake_minimum_required(VERSION 3.17)
 
 project(FidelityFX_SC)
 
-# Enable multi-threaded compilation
-add_compile_options(/MP)
+if(MSVC)
+    # Enable multi-threaded compilation
+    add_compile_options(/MP)
+endif()
 
 # General language options (require language standards specified)
 set(CMAKE_CXX_STANDARD 17)

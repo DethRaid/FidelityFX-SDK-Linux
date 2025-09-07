@@ -22,12 +22,15 @@
 
 #pragma once
 
+#ifdef _WIN32
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <atlcomcli.h>
 #include <dxcapi.h>
 #include <d3dcompiler.h>
+#include <d3d12shader.h>
+#endif
 #include <assert.h>
 #include <stdio.h>
 #include <exception>
@@ -44,7 +47,6 @@
 #include <iostream>
 #include <algorithm>
 #include <fstream>
-#include <d3d12shader.h>
 
 #include <filesystem>
 namespace fs = std::filesystem;

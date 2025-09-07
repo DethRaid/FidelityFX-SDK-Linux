@@ -135,10 +135,10 @@ if (NOT FFX_CUSTOM_API)
 else()
 
 	# Ouput the static libs to the /bin folder as they are uniquely named
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${BIN_OUTPUT}/ffx_sdk)
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/bin/ffx_sdk)
 	foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
 		string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
-		set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${BIN_OUTPUT}/ffx_sdk/ )
+		set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_HOME_DIRECTORY}/bin/ffx_sdk/ )
 		if (FFX_BUILD_AS_DLL)
 			# Write both debug and release versions of the dlls to the /bin folder as they are uniquely named
 			set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${CMAKE_HOME_DIRECTORY}/bin/ffx_sdk/)

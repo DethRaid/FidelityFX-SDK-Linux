@@ -66,6 +66,12 @@ size_t GLSLShaderBinary::BufferSize()
     return spirv.size();
 }
 
+#ifdef _WIN32
+static std::string glslangDefaultPath = "glslangValidator.exe";
+#else
+static std::string glslangDefaultPath = "glslangValidator";
+#endif
+
 GLSLCompiler::GLSLCompiler(const std::string& glslangExe,
                            const std::string& shaderPath,
                            const std::string& shaderName,
@@ -74,7 +80,7 @@ GLSLCompiler::GLSLCompiler(const std::string& glslangExe,
                            bool               disableLogs,
                            bool               debugCompile)
     : ICompiler(shaderPath, shaderName, shaderFileName, outputPath, disableLogs, debugCompile)
-    , m_GlslangExe(glslangExe.empty() ? "glslangValidator.exe" : glslangExe)
+    , m_GlslangExe(glslangExe.empty() ? glslangDefaultPath : glslangExe)
 {
     fs::create_directory(m_OutputPath + "/" + m_ShaderName + "_temp");
 }

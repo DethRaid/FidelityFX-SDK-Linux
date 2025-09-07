@@ -59,7 +59,11 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup ffxClassifier
+#ifdef __clang__
 #define FFX_CLASSIFIER_CONTEXT_SIZE  (139992 / 4)
+#else
+#define FFX_CLASSIFIER_CONTEXT_SIZE (18500)
+#endif
 
 #if defined(__cplusplus)
 extern "C" {

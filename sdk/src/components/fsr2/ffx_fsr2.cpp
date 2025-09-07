@@ -36,6 +36,7 @@
 
 #include <FidelityFX/host/ffx_fsr2.h>
 #define FFX_CPU
+#include <cwchar>
 #include <FidelityFX/gpu/ffx_core.h>
 #include <FidelityFX/gpu/fsr1/ffx_fsr1.h>
 #include <FidelityFX/gpu/spd/ffx_spd.h>
@@ -326,12 +327,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvIndex = 0; srvIndex < inoutPipeline->srvTextureCount; ++srvIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(srvTextureBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(srvTextureBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(srvTextureBindingTable[mapIndex].name, inoutPipeline->srvTextureBindings[srvIndex].name))
                 break;
         }
-        if (mapIndex == _countof(srvTextureBindingTable))
+        if (mapIndex == std::extent<decltype(srvTextureBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvTextureBindings[srvIndex].resourceIdentifier = srvTextureBindingTable[mapIndex].index;
@@ -340,12 +341,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavTextureCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavTextureBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(uavTextureBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(uavTextureBindingTable[mapIndex].name, inoutPipeline->uavTextureBindings[uavIndex].name))
                 break;
         }
-        if (mapIndex == _countof(uavTextureBindingTable))
+        if (mapIndex == std::extent<decltype(uavTextureBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavTextureBindings[uavIndex].resourceIdentifier = uavTextureBindingTable[mapIndex].index;
@@ -354,12 +355,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t cbIndex = 0; cbIndex < inoutPipeline->constCount; ++cbIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(constantBufferBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent<decltype(constantBufferBindingTable)>::value; ++mapIndex)
         {
             if (0 == wcscmp(constantBufferBindingTable[mapIndex].name, inoutPipeline->constantBufferBindings[cbIndex].name))
                 break;
         }
-        if (mapIndex == _countof(constantBufferBindingTable))
+        if (mapIndex == std::extent<decltype(constantBufferBindingTable)>::value)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->constantBufferBindings[cbIndex].resourceIdentifier = constantBufferBindingTable[mapIndex].index;
@@ -431,42 +432,42 @@ static FfxErrorCode createPipelineStates(FfxFsr2Context_Private* context)
     uint32_t contextFlags = context->contextDescription.flags;
 
     // Set up pipeline descriptor (basically RootSignature and binding)
-    wcscpy_s(pipelineDescription.name, L"FSR2-LUM_PYRAMID");
+    wcscpy(pipelineDescription.name, L"FSR2-LUM_PYRAMID");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR2, FFX_FSR2_PASS_COMPUTE_LUMINANCE_PYRAMID,
         getPipelinePermutationFlags(contextFlags, FFX_FSR2_PASS_COMPUTE_LUMINANCE_PYRAMID, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineComputeLuminancePyramid));
-    wcscpy_s(pipelineDescription.name, L"FSR2-RCAS");
+    wcscpy(pipelineDescription.name, L"FSR2-RCAS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR2, FFX_FSR2_PASS_RCAS,
         getPipelinePermutationFlags(contextFlags, FFX_FSR2_PASS_RCAS, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineRCAS));
-    wcscpy_s(pipelineDescription.name, L"FSR2-GEN_REACTIVE");
+    wcscpy(pipelineDescription.name, L"FSR2-GEN_REACTIVE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR2, FFX_FSR2_PASS_GENERATE_REACTIVE,
         getPipelinePermutationFlags(contextFlags, FFX_FSR2_PASS_GENERATE_REACTIVE, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineGenerateReactive));
-    wcscpy_s(pipelineDescription.name, L"FSR2-TCR_AUTOGENERATE");
+    wcscpy(pipelineDescription.name, L"FSR2-TCR_AUTOGENERATE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR2, FFX_FSR2_PASS_TCR_AUTOGENERATE,
         getPipelinePermutationFlags(contextFlags, FFX_FSR2_PASS_TCR_AUTOGENERATE, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineTcrAutogenerate));
 
     pipelineDescription.rootConstantBufferCount = 1;
 
-    wcscpy_s(pipelineDescription.name, L"FSR2-DEPTH_CLIP");
+    wcscpy(pipelineDescription.name, L"FSR2-DEPTH_CLIP");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR2, FFX_FSR2_PASS_DEPTH_CLIP,
         getPipelinePermutationFlags(contextFlags, FFX_FSR2_PASS_DEPTH_CLIP, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineDepthClip));
-    wcscpy_s(pipelineDescription.name, L"FSR2-RECON_PREV_DEPTH");
+    wcscpy(pipelineDescription.name, L"FSR2-RECON_PREV_DEPTH");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR2, FFX_FSR2_PASS_RECONSTRUCT_PREVIOUS_DEPTH,
         getPipelinePermutationFlags(contextFlags, FFX_FSR2_PASS_RECONSTRUCT_PREVIOUS_DEPTH, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineReconstructPreviousDepth));
-    wcscpy_s(pipelineDescription.name, L"FSR2-LOCK");
+    wcscpy(pipelineDescription.name, L"FSR2-LOCK");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR2, FFX_FSR2_PASS_LOCK,
         getPipelinePermutationFlags(contextFlags, FFX_FSR2_PASS_LOCK, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineLock));
-    wcscpy_s(pipelineDescription.name, L"FSR2-ACCUMULATE");
+    wcscpy(pipelineDescription.name, L"FSR2-ACCUMULATE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR2, FFX_FSR2_PASS_ACCUMULATE,
         getPipelinePermutationFlags(contextFlags, FFX_FSR2_PASS_ACCUMULATE, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineAccumulate));
-    wcscpy_s(pipelineDescription.name, L"FSR2-ACCUM_SHARP");
+    wcscpy(pipelineDescription.name, L"FSR2-ACCUM_SHARP");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR2, FFX_FSR2_PASS_ACCUMULATE_SHARPEN,
         getPipelinePermutationFlags(contextFlags, FFX_FSR2_PASS_ACCUMULATE_SHARPEN, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineAccumulateSharpen));
@@ -975,7 +976,7 @@ static void setupDeviceDepthToViewSpaceDepthParams(FfxFsr2Context_Private* conte
 static void scheduleDispatch(FfxFsr2Context_Private* context, const FfxFsr2DispatchDescription*, const FfxPipelineState* pipeline, uint32_t dispatchX, uint32_t dispatchY)
 {
     FfxGpuJobDescription dispatchJob = {FFX_GPU_JOB_COMPUTE};
-    wcscpy_s(dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
 
     for (uint32_t currentShaderResourceViewIndex = 0; currentShaderResourceViewIndex < pipeline->srvTextureCount; ++currentShaderResourceViewIndex) {
 
@@ -983,7 +984,7 @@ static void scheduleDispatch(FfxFsr2Context_Private* context, const FfxFsr2Dispa
         const FfxResourceInternal currentResource = context->srvResources[currentResourceId];
         dispatchJob.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(dispatchJob.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].name,
+        wcscpy(dispatchJob.computeJobDescriptor.srvTextures[currentShaderResourceViewIndex].name,
                  pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
@@ -992,7 +993,7 @@ static void scheduleDispatch(FfxFsr2Context_Private* context, const FfxFsr2Dispa
 
         const uint32_t currentResourceId = pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].resourceIdentifier;
 #ifdef FFX_DEBUG
-        wcscpy_s(dispatchJob.computeJobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name,
+        wcscpy(dispatchJob.computeJobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name,
                  pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
 #endif
         if (currentResourceId >= FFX_FSR2_RESOURCE_IDENTIFIER_SCENE_LUMINANCE_MIPMAP_0 && currentResourceId <= FFX_FSR2_RESOURCE_IDENTIFIER_SCENE_LUMINANCE_MIPMAP_12)
@@ -1017,7 +1018,7 @@ static void scheduleDispatch(FfxFsr2Context_Private* context, const FfxFsr2Dispa
 
     for (uint32_t currentRootConstantIndex = 0; currentRootConstantIndex < pipeline->constCount; ++currentRootConstantIndex) {
 #ifdef FFX_DEBUG
-        wcscpy_s(dispatchJob.computeJobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
+        wcscpy(dispatchJob.computeJobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
 #endif
         dispatchJob.computeJobDescriptor.cbs[currentRootConstantIndex] = context->constantBuffers[pipeline->constantBufferBindings[currentRootConstantIndex].resourceIdentifier];
     }
@@ -1039,7 +1040,7 @@ static FfxErrorCode fsr2Dispatch(FfxFsr2Context_Private* context, const FfxFsr2D
     if (context->firstExecution)
     {
         FfxGpuJobDescription clearJob = { FFX_GPU_JOB_CLEAR_FLOAT };
-        wcscpy_s(clearJob.jobLabel, L"Zero initialize resource");
+        wcscpy(clearJob.jobLabel, L"Zero initialize resource");
 
         const float clearValuesToZeroFloat[]{ 0.f, 0.f, 0.f, 0.f };
         memcpy(clearJob.clearJobDescriptor.color, clearValuesToZeroFloat, 4 * sizeof(float));
@@ -1212,7 +1213,7 @@ static FfxErrorCode fsr2Dispatch(FfxFsr2Context_Private* context, const FfxFsr2D
     if (resetAccumulation) {
 
         FfxGpuJobDescription clearJob = { FFX_GPU_JOB_CLEAR_FLOAT };
-        wcscpy_s(clearJob.jobLabel, L"Zero initialize resource");
+        wcscpy(clearJob.jobLabel, L"Zero initialize resource");
         // LockStatus resource has no sign bit, callback functions are compensating for this.
         // Clearing the resource must follow the same logic.
         float clearValuesLockStatus[4]{};
@@ -1529,9 +1530,9 @@ FfxErrorCode ffxFsr2ContextGenerateReactiveMask(FfxFsr2Context* context, const F
     jobDescriptor.uavTextures[0].resource = contextPrivate->uavResources[FFX_FSR2_RESOURCE_IDENTIFIER_AUTOREACTIVE];
 
 #ifdef FFX_DEBUG
-    wcscpy_s(jobDescriptor.srvTextures[0].name, pipeline->srvTextureBindings[0].name);
-    wcscpy_s(jobDescriptor.srvTextures[1].name, pipeline->srvTextureBindings[1].name);
-    wcscpy_s(jobDescriptor.uavTextures[0].name, pipeline->uavTextureBindings[0].name);
+    wcscpy(jobDescriptor.srvTextures[0].name, pipeline->srvTextureBindings[0].name);
+    wcscpy(jobDescriptor.srvTextures[1].name, pipeline->srvTextureBindings[1].name);
+    wcscpy(jobDescriptor.uavTextures[0].name, pipeline->uavTextureBindings[0].name);
 #endif
 
     jobDescriptor.dimensions[0] = dispatchSrcX;
@@ -1545,7 +1546,7 @@ FfxErrorCode ffxFsr2ContextGenerateReactiveMask(FfxFsr2Context* context, const F
         const FfxResourceInternal currentResource = contextPrivate->srvResources[currentResourceId];
         jobDescriptor.srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
 
@@ -1560,10 +1561,10 @@ FfxErrorCode ffxFsr2ContextGenerateReactiveMask(FfxFsr2Context* context, const F
                                                                                       sizeof(constants),
                                                                                       &jobDescriptor.cbs[0]);
 #ifdef FFX_DEBUG
-    wcscpy_s(jobDescriptor.cbNames[0], pipeline->constantBufferBindings[0].name);
+    wcscpy(jobDescriptor.cbNames[0], pipeline->constantBufferBindings[0].name);
 #endif
     FfxGpuJobDescription dispatchJob = { FFX_GPU_JOB_COMPUTE };
-    wcscpy_s(dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
     dispatchJob.computeJobDescriptor = jobDescriptor;
 
     //contextPrivate->contextDescription.backendInterface.fpScheduleGpuJob(&contextPrivate->contextDescription.backendInterface, &dispatchJob);
@@ -1598,10 +1599,10 @@ static FfxErrorCode generateReactiveMaskInternal(FfxFsr2Context_Private* context
     jobDescriptor.uavTextures[3].resource = contextPrivate->uavResources[FFX_FSR2_RESOURCE_IDENTIFIER_PREV_POST_ALPHA_COLOR];
 
 #ifdef FFX_DEBUG
-    wcscpy_s(jobDescriptor.uavTextures[0].name, pipeline->uavTextureBindings[0].name);
-    wcscpy_s(jobDescriptor.uavTextures[1].name, pipeline->uavTextureBindings[1].name);
-    wcscpy_s(jobDescriptor.uavTextures[2].name, pipeline->uavTextureBindings[2].name);
-    wcscpy_s(jobDescriptor.uavTextures[3].name, pipeline->uavTextureBindings[3].name);
+    wcscpy(jobDescriptor.uavTextures[0].name, pipeline->uavTextureBindings[0].name);
+    wcscpy(jobDescriptor.uavTextures[1].name, pipeline->uavTextureBindings[1].name);
+    wcscpy(jobDescriptor.uavTextures[2].name, pipeline->uavTextureBindings[2].name);
+    wcscpy(jobDescriptor.uavTextures[3].name, pipeline->uavTextureBindings[3].name);
 #endif
 
     jobDescriptor.dimensions[0] = dispatchSrcX;
@@ -1615,20 +1616,20 @@ static FfxErrorCode generateReactiveMaskInternal(FfxFsr2Context_Private* context
         const FfxResourceInternal currentResource = contextPrivate->srvResources[currentResourceId];
         jobDescriptor.srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
 
     for (uint32_t currentRootConstantIndex = 0; currentRootConstantIndex < pipeline->constCount; ++currentRootConstantIndex) {
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
+        wcscpy(jobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
 #endif
         jobDescriptor.cbs[currentRootConstantIndex] = contextPrivate->constantBuffers[pipeline->constantBufferBindings[currentRootConstantIndex].resourceIdentifier];
         //jobDescriptor.cbSlotIndex[currentRootConstantIndex] = pipeline->constantBufferBindings[currentRootConstantIndex].slotIndex;
     }
 
     FfxGpuJobDescription dispatchJob = { FFX_GPU_JOB_COMPUTE };
-    wcscpy_s(dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
     dispatchJob.computeJobDescriptor = jobDescriptor;
 
     contextPrivate->contextDescription.backendInterface.fpScheduleGpuJob(&contextPrivate->contextDescription.backendInterface, &dispatchJob);

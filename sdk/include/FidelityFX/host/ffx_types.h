@@ -77,7 +77,11 @@
 #define FFX_API __declspec(dllexport)
 #endif // #if defined (FFX_GCC)
 
+#ifdef __clang__
+#define FFX_SDK_DEFAULT_CONTEXT_SIZE (837848 / 4)
+#else
 #define FFX_SDK_DEFAULT_CONTEXT_SIZE (1024 * 128)
+#endif
 
 /// Maximum supported number of simultaneously bound SRVs.
 ///

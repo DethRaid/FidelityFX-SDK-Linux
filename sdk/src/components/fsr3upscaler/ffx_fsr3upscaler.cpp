@@ -33,6 +33,7 @@
 #pragma clang diagnostic ignored "-Wsign-compare"
 #endif
 
+#include <cwchar>
 #include <FidelityFX/gpu/ffx_core.h>
 #include <FidelityFX/gpu/fsr1/ffx_fsr1.h>
 #include <FidelityFX/gpu/spd/ffx_spd.h>
@@ -319,12 +320,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t srvIndex = 0; srvIndex < inoutPipeline->srvTextureCount; ++srvIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(srvTextureBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(srvTextureBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(srvTextureBindingTable[mapIndex].name, inoutPipeline->srvTextureBindings[srvIndex].name))
                 break;
         }
-        if (mapIndex == _countof(srvTextureBindingTable))
+        if (mapIndex == std::extent_v<decltype(srvTextureBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->srvTextureBindings[srvIndex].resourceIdentifier = srvTextureBindingTable[mapIndex].index;
@@ -333,12 +334,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavTextureCount; ++uavIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(uavTextureBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(uavTextureBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(uavTextureBindingTable[mapIndex].name, inoutPipeline->uavTextureBindings[uavIndex].name))
                 break;
         }
-        if (mapIndex == _countof(uavTextureBindingTable))
+        if (mapIndex == std::extent_v<decltype(uavTextureBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->uavTextureBindings[uavIndex].resourceIdentifier = uavTextureBindingTable[mapIndex].index;
@@ -347,12 +348,12 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
     for (uint32_t cbIndex = 0; cbIndex < inoutPipeline->constCount; ++cbIndex)
     {
         int32_t mapIndex = 0;
-        for (mapIndex = 0; mapIndex < _countof(constantBufferBindingTable); ++mapIndex)
+        for (mapIndex = 0; mapIndex < std::extent_v<decltype(constantBufferBindingTable)>; ++mapIndex)
         {
             if (0 == wcscmp(constantBufferBindingTable[mapIndex].name, inoutPipeline->constantBufferBindings[cbIndex].name))
                 break;
         }
-        if (mapIndex == _countof(constantBufferBindingTable))
+        if (mapIndex == std::extent_v<decltype(constantBufferBindingTable)>)
             return FFX_ERROR_INVALID_ARGUMENT;
 
         inoutPipeline->constantBufferBindings[cbIndex].resourceIdentifier = constantBufferBindingTable[mapIndex].index;
@@ -427,57 +428,57 @@ static FfxErrorCode createPipelineStates(FfxFsr3UpscalerContext_Private* context
     uint32_t contextFlags = context->contextDescription.flags;
 
     // Set up pipeline descriptor (basically RootSignature and binding)
-    wcscpy_s(pipelineDescription.name, L"FSR3-LUMA-PYRAMID");
+    wcscpy(pipelineDescription.name, L"FSR3-LUMA-PYRAMID");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR3UPSCALER, FFX_FSR3UPSCALER_PASS_LUMA_PYRAMID,
         getPipelinePermutationFlags(contextFlags, FFX_FSR3UPSCALER_PASS_LUMA_PYRAMID, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineLumaPyramid));
-    wcscpy_s(pipelineDescription.name, L"FSR3-RCAS");
+    wcscpy(pipelineDescription.name, L"FSR3-RCAS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR3UPSCALER, FFX_FSR3UPSCALER_PASS_RCAS,
         getPipelinePermutationFlags(contextFlags, FFX_FSR3UPSCALER_PASS_RCAS, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineRCAS));
-    wcscpy_s(pipelineDescription.name, L"FSR3-GEN_REACTIVE");
+    wcscpy(pipelineDescription.name, L"FSR3-GEN_REACTIVE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR3UPSCALER, FFX_FSR3UPSCALER_PASS_GENERATE_REACTIVE,
         getPipelinePermutationFlags(contextFlags, FFX_FSR3UPSCALER_PASS_GENERATE_REACTIVE, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineGenerateReactive));
 
     pipelineDescription.rootConstantBufferCount = 1;
 
-    wcscpy_s(pipelineDescription.name, L"FSR3-PREPARE-INPUTS");
+    wcscpy(pipelineDescription.name, L"FSR3-PREPARE-INPUTS");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR3UPSCALER, FFX_FSR3UPSCALER_PASS_PREPARE_INPUTS,
         getPipelinePermutationFlags(contextFlags, FFX_FSR3UPSCALER_PASS_PREPARE_INPUTS, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelinePrepareInputs));
 
-    wcscpy_s(pipelineDescription.name, L"FSR3-PREPARE-REACTIVITY");
+    wcscpy(pipelineDescription.name, L"FSR3-PREPARE-REACTIVITY");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR3UPSCALER, FFX_FSR3UPSCALER_PASS_PREPARE_REACTIVITY,
         getPipelinePermutationFlags(contextFlags, FFX_FSR3UPSCALER_PASS_PREPARE_REACTIVITY, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelinePrepareReactivity));
     
-    wcscpy_s(pipelineDescription.name, L"FSR3-SHADING-CHANGE");
+    wcscpy(pipelineDescription.name, L"FSR3-SHADING-CHANGE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR3UPSCALER, FFX_FSR3UPSCALER_PASS_SHADING_CHANGE,
         getPipelinePermutationFlags(contextFlags, FFX_FSR3UPSCALER_PASS_SHADING_CHANGE, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineShadingChange));
     
-    wcscpy_s(pipelineDescription.name, L"FSR3-ACCUMULATE");
+    wcscpy(pipelineDescription.name, L"FSR3-ACCUMULATE");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR3UPSCALER, FFX_FSR3UPSCALER_PASS_ACCUMULATE,
         getPipelinePermutationFlags(contextFlags, FFX_FSR3UPSCALER_PASS_ACCUMULATE, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineAccumulate));
     
-    wcscpy_s(pipelineDescription.name, L"FSR3-ACCUM_SHARP");
+    wcscpy(pipelineDescription.name, L"FSR3-ACCUM_SHARP");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR3UPSCALER, FFX_FSR3UPSCALER_PASS_ACCUMULATE_SHARPEN,
         getPipelinePermutationFlags(contextFlags, FFX_FSR3UPSCALER_PASS_ACCUMULATE_SHARPEN, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineAccumulateSharpen));
 
-    wcscpy_s(pipelineDescription.name, L"FSR3-SHADING-CHANGE-PYRAMID");
+    wcscpy(pipelineDescription.name, L"FSR3-SHADING-CHANGE-PYRAMID");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR3UPSCALER, FFX_FSR3UPSCALER_PASS_SHADING_CHANGE_PYRAMID,
         getPipelinePermutationFlags(contextFlags, FFX_FSR3UPSCALER_PASS_SHADING_CHANGE_PYRAMID, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineShadingChangePyramid));
 
-    wcscpy_s(pipelineDescription.name, L"FSR3-LUMA-INSTABILITY");
+    wcscpy(pipelineDescription.name, L"FSR3-LUMA-INSTABILITY");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR3UPSCALER, FFX_FSR3UPSCALER_PASS_LUMA_INSTABILITY,
         getPipelinePermutationFlags(contextFlags, FFX_FSR3UPSCALER_PASS_LUMA_INSTABILITY, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineLumaInstability));
 
-    wcscpy_s(pipelineDescription.name, L"FSR3-DEBUG-VIEW");
+    wcscpy(pipelineDescription.name, L"FSR3-DEBUG-VIEW");
     FFX_VALIDATE(context->contextDescription.backendInterface.fpCreatePipeline(&context->contextDescription.backendInterface, FFX_EFFECT_FSR3UPSCALER, FFX_FSR3UPSCALER_PASS_DEBUG_VIEW,
         getPipelinePermutationFlags(contextFlags, FFX_FSR3UPSCALER_PASS_DEBUG_VIEW, supportedFP16, canForceWave64, useLut),
         &pipelineDescription, context->effectContextId, &context->pipelineDebugView));
@@ -766,7 +767,7 @@ static void scheduleDispatch(FfxFsr3UpscalerContext_Private* context, const FfxF
         const FfxResourceInternal currentResource = context->srvResources[currentResourceId];
         jobDescriptor.srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
 
@@ -774,7 +775,7 @@ static void scheduleDispatch(FfxFsr3UpscalerContext_Private* context, const FfxF
 
         const uint32_t currentResourceId = pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].resourceIdentifier;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name, pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy(jobDescriptor.uavTextures[currentUnorderedAccessViewIndex].name, pipeline->uavTextureBindings[currentUnorderedAccessViewIndex].name);
 #endif
 
         if (currentResourceId >= FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_SPD_MIPS_LEVEL_0 && currentResourceId <= FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_SPD_MIPS_LEVEL_5)
@@ -798,13 +799,13 @@ static void scheduleDispatch(FfxFsr3UpscalerContext_Private* context, const FfxF
 
     for (uint32_t currentRootConstantIndex = 0; currentRootConstantIndex < pipeline->constCount; ++currentRootConstantIndex) {
 #ifdef FFX_DEBUG
-        wcscpy_s( jobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
+        wcscpy( jobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
 #endif
         jobDescriptor.cbs[currentRootConstantIndex] = context->constantBuffers[pipeline->constantBufferBindings[currentRootConstantIndex].resourceIdentifier];
     }
 
     FfxGpuJobDescription dispatchJob = { FFX_GPU_JOB_COMPUTE };
-    wcscpy_s(dispatchJob.jobLabel, pipeline->name);
+    wcscpy(dispatchJob.jobLabel, pipeline->name);
     dispatchJob.computeJobDescriptor = jobDescriptor;
 
     context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &dispatchJob);
@@ -848,17 +849,17 @@ static FfxErrorCode fsr3upscalerDispatch(FfxFsr3UpscalerContext_Private* context
         const float clearValuesToZeroFloat[]{ 0.f, 0.f, 0.f, 0.f };
         memcpy(clearJob.clearJobDescriptor.color, clearValuesToZeroFloat, 4 * sizeof(float));
 
-        wcscpy_s(clearJob.jobLabel, L"Clear Accumulation 1");
+        wcscpy(clearJob.jobLabel, L"Clear Accumulation 1");
         clearJob.clearJobDescriptor.target = context->srvResources[FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_ACCUMULATION_1];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Accumulation 2");
+        wcscpy(clearJob.jobLabel, L"Clear Accumulation 2");
         clearJob.clearJobDescriptor.target = context->srvResources[FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_ACCUMULATION_2];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
 
-        wcscpy_s(clearJob.jobLabel, L"Clear Temporal Luma 1");
+        wcscpy(clearJob.jobLabel, L"Clear Temporal Luma 1");
         clearJob.clearJobDescriptor.target = context->srvResources[FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_LUMA_1];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
-        wcscpy_s(clearJob.jobLabel, L"Clear Temporal Luma 2");
+        wcscpy(clearJob.jobLabel, L"Clear Temporal Luma 2");
         clearJob.clearJobDescriptor.target = context->srvResources[FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_LUMA_2];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
     }
@@ -1043,14 +1044,14 @@ static FfxErrorCode fsr3upscalerDispatch(FfxFsr3UpscalerContext_Private* context
     if (resetAccumulation) {
 
         FfxGpuJobDescription clearJob = { FFX_GPU_JOB_CLEAR_FLOAT };
-        wcscpy_s(clearJob.jobLabel, L"Clear Resource");
+        wcscpy(clearJob.jobLabel, L"Clear Resource");
 
         const float clearValuesToZeroFloat[]{ 0.f, 0.f, 0.f, 0.f };
         memcpy(clearJob.clearJobDescriptor.color, clearValuesToZeroFloat, 4 * sizeof(float));
         clearJob.clearJobDescriptor.target = context->srvResources[accumulationSrvResourceIndex];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
 
-        wcscpy_s(clearJob.jobLabel, L"Clear Scene Luminance");
+        wcscpy(clearJob.jobLabel, L"Clear Scene Luminance");
         clearJob.clearJobDescriptor.target = context->srvResources[FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_SPD_MIPS];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
 
@@ -1058,7 +1059,7 @@ static FfxErrorCode fsr3upscalerDispatch(FfxFsr3UpscalerContext_Private* context
         {
             const float clearValuesExposure[]{ -1.f, 1.f, 0.f, 0.f };
             memcpy(clearJob.clearJobDescriptor.color, clearValuesExposure, 4 * sizeof(float));
-            wcscpy_s(clearJob.jobLabel, L"Clear Frame Info");
+            wcscpy(clearJob.jobLabel, L"Clear Frame Info");
             clearJob.clearJobDescriptor.target = context->srvResources[FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_FRAME_INFO];
             context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
         }
@@ -1071,7 +1072,7 @@ static FfxErrorCode fsr3upscalerDispatch(FfxFsr3UpscalerContext_Private* context
         const bool  bInverted = (context->contextDescription.flags & FFX_FSR3UPSCALER_ENABLE_DEPTH_INVERTED) == FFX_FSR3UPSCALER_ENABLE_DEPTH_INVERTED;
         const float clearDepthValue[]{bInverted ? 0.f : 1.f, bInverted ? 0.f : 1.f, bInverted ? 0.f : 1.f, bInverted ? 0.f : 1.f};
         memcpy(clearJob.clearJobDescriptor.color, clearDepthValue, 4 * sizeof(float));
-        wcscpy_s(clearJob.jobLabel, L"Clear Reconstructed Previous Nearest Depth");
+        wcscpy(clearJob.jobLabel, L"Clear Reconstructed Previous Nearest Depth");
         clearJob.clearJobDescriptor.target = context->srvResources[FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_RECONSTRUCTED_PREVIOUS_NEAREST_DEPTH];
         context->contextDescription.backendInterface.fpScheduleGpuJob(&context->contextDescription.backendInterface, &clearJob);
     }
@@ -1079,7 +1080,7 @@ static FfxErrorCode fsr3upscalerDispatch(FfxFsr3UpscalerContext_Private* context
     // Suggested by Enduring to resolve issues with running FSR3 on console via the RHI backend in the plugin as this resource won't be cleared to 0 by default.
 	{
 		FfxGpuJobDescription clearJob = { FFX_GPU_JOB_CLEAR_FLOAT };
-		wcscpy_s(clearJob.jobLabel, L"Clear Spd Atomic Count");
+		wcscpy(clearJob.jobLabel, L"Clear Spd Atomic Count");
 		const float clearValuesToZeroFloat[]{ 0.f, 0.f, 0.f, 0.f };
 		memcpy(clearJob.clearJobDescriptor.color, clearValuesToZeroFloat, 4 * sizeof(float));
 		clearJob.clearJobDescriptor.target = context->uavResources[FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_SPD_ATOMIC_COUNT];
@@ -1122,7 +1123,7 @@ static FfxErrorCode fsr3upscalerDispatch(FfxFsr3UpscalerContext_Private* context
             context->uavResources[FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_FARTHEST_DEPTH_MIP1],
             context->uavResources[FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_DILATED_REACTIVE_MASKS],
         };
-        for(int i = 0; i<_countof(aliasableResources); ++i)
+        for(int i = 0; i<std::extent_v<decltype(aliasableResources)>; ++i)
         {
             FfxGpuJobDescription discardJob = { FFX_GPU_JOB_DISCARD };
             discardJob.discardJobDescriptor.target = aliasableResources[i];
@@ -1131,7 +1132,7 @@ static FfxErrorCode fsr3upscalerDispatch(FfxFsr3UpscalerContext_Private* context
         // SPD counter needs to be cleared
         {
             FfxGpuJobDescription clearJob = { FFX_GPU_JOB_CLEAR_FLOAT };
-            wcscpy_s(clearJob.jobLabel, L"Clear Spd Atomic Count");
+            wcscpy(clearJob.jobLabel, L"Clear Spd Atomic Count");
             const float clearValuesToZeroFloat[]{ 0.f, 0.f, 0.f, 0.f };
             memcpy(clearJob.clearJobDescriptor.color, clearValuesToZeroFloat, 4 * sizeof(float));
             clearJob.clearJobDescriptor.target = context->uavResources[FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_SPD_MIPS];
@@ -1383,9 +1384,9 @@ FfxErrorCode ffxFsr3UpscalerContextGenerateReactiveMask(FfxFsr3UpscalerContext* 
     jobDescriptor.uavTextures[0].resource = contextPrivate->uavResources[FFX_FSR3UPSCALER_RESOURCE_IDENTIFIER_AUTOREACTIVE];
 
 #ifdef FFX_DEBUG
-    wcscpy_s(jobDescriptor.srvTextures[0].name, pipeline->srvTextureBindings[0].name);
-    wcscpy_s(jobDescriptor.srvTextures[1].name, pipeline->srvTextureBindings[1].name);
-    wcscpy_s(jobDescriptor.uavTextures[0].name, pipeline->uavTextureBindings[0].name);
+    wcscpy(jobDescriptor.srvTextures[0].name, pipeline->srvTextureBindings[0].name);
+    wcscpy(jobDescriptor.srvTextures[1].name, pipeline->srvTextureBindings[1].name);
+    wcscpy(jobDescriptor.uavTextures[0].name, pipeline->uavTextureBindings[0].name);
 #endif
 
     jobDescriptor.dimensions[0] = dispatchSrcX;
@@ -1399,7 +1400,7 @@ FfxErrorCode ffxFsr3UpscalerContextGenerateReactiveMask(FfxFsr3UpscalerContext* 
         const FfxResourceInternal currentResource = contextPrivate->srvResources[currentResourceId];
         jobDescriptor.srvTextures[currentShaderResourceViewIndex].resource = currentResource;
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor.srvTextures[currentShaderResourceViewIndex].name, pipeline->srvTextureBindings[currentShaderResourceViewIndex].name);
 #endif
     }
 
@@ -1414,7 +1415,7 @@ FfxErrorCode ffxFsr3UpscalerContextGenerateReactiveMask(FfxFsr3UpscalerContext* 
     for (uint32_t currentRootConstantIndex = 0; currentRootConstantIndex < pipeline->constCount; ++currentRootConstantIndex)
     {
 #ifdef FFX_DEBUG
-        wcscpy_s(jobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
+        wcscpy(jobDescriptor.cbNames[currentRootConstantIndex], pipeline->constantBufferBindings[currentRootConstantIndex].name);
 #endif
         jobDescriptor.cbs[currentRootConstantIndex] = contextPrivate->constantBuffers[pipeline->constantBufferBindings[currentRootConstantIndex].resourceIdentifier];
     }

@@ -75,7 +75,7 @@ Linux support has been added by DethRaid (me). I've made the following changes t
 - `sdk/toolchain.cmake` does not set the `CMAKE_GENERATOR_PLATFORM` variable if we're building the VK or D3D12 backend on anything except Windows
 - If CMAKE_GENERATOR_PLATFORM is not set, `sdk/CMakeLists.txt` sets `FFX_PLATFORM_NAME` to `x64`
 - I've removed the `_s` functions throughout the code base. While versions of these are available in C11, my system (Manjaro Linux with Clang 20.8.1) does not support them
-- I've changed usage of `_countof` to `std::extent<decltype(variable)>::value` for better cross-platform compatibility
+- I've changed usage of `_countof` to `std::extent_v<decltype(variable)>` for better cross-platform compatibility
 - I've increased the sizes of many of the context structs to account for the size of the private data (it's bigger for some reason?)
 - I added an include for `math.h` in `ffx_core_cpu.h`
 - Added some explicit casts to `uint32_t`

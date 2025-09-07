@@ -32,6 +32,7 @@
 #include <unordered_set>
 #include <locale>
 #include <stdexcept>
+#include <span>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -1038,9 +1039,10 @@ void Application::DumpDepfileGCC()
     FILE* fp = nullptr;
 
     fs::path outputFilename = m_Params.ouputPath / (m_ShaderName + L"_permutations.h");
-    std::wstring depfilePath = outputFilename.wstring() + L".d";
+    fs::path depfilePath = outputFilename.wstring() + L".d";
+    const auto depfileString = depfilePath.string();
 
-    _wfopen_s(&fp, depfilePath.c_str(), L"wb");
+    fp = fopen(depfileString.c_str(), "wb");
 
     fs::path output = outputFilename;
 
@@ -1082,9 +1084,28 @@ int wmain(int argc, wchar_t** argv)
         return 0;
     }
     catch (const std::exception& ex)
-    {   
+    {
         fprintf(stderr, "ffx_sc failed: %s\n", ex.what());
         fflush(stderr);
         return -1;
     }
 }
+
+#ifndef _WIN32
+int main(int argc, char** argv) {
+    auto argument_vector = std::vector<std::wstring>{};
+    argument_vector.reserve(argc);
+
+    for (int i = 0; i < argc; i++) {
+        argument_vector.emplace_back(UTF8ToWChar(std::string{argv[i]}));
+    }
+
+    auto pointed_argument_vector = std::vector<wchar_t*>{};
+    pointed_argument_vector.reserve(argc);
+    for (auto& wstr : argument_vector) {
+        pointed_argument_vector.emplace_back(wstr.data());
+    }
+
+    return wmain(argc, pointed_argument_vector.data());
+}
+#endif

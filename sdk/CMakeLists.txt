@@ -241,6 +241,11 @@ else()
 	project (FidelityFX-SDK)
 endif()
 
+# compatibility problems
+if(NOT MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdeclspec")
+endif()
+
 # Components
 add_subdirectory(${FFX_COMPONENTS_PATH}/opticalflow)
 add_subdirectory(${FFX_COMPONENTS_PATH}/frameinterpolation)

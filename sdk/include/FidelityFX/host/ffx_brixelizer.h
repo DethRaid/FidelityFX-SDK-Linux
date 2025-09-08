@@ -27,7 +27,7 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup ffxBrixelizer
-#ifdef __clang__
+#ifdef __linux__
 #define FFX_BRIXELIZER_CONTEXT_SIZE            (24787544 / 4)
 #else
 #define FFX_BRIXELIZER_CONTEXT_SIZE (5938838)
@@ -36,7 +36,7 @@
 /// The size of the update description specified in 32bit values.
 ///
 /// @ingroup ffxBrixelizer
-#ifdef __clang__
+#ifdef __linux__
 #define FFX_BRIXELIZER_UPDATE_DESCRIPTION_SIZE (8403904 / 4)
 #else
 #define FFX_BRIXELIZER_UPDATE_DESCRIPTION_SIZE 2099376

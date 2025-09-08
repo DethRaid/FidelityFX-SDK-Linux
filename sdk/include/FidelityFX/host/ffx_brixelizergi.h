@@ -50,7 +50,7 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup ffxBrixgi
-#ifdef __clang__
+#ifdef __linux__
 #define FFX_BRIXELIZER_GI_CONTEXT_SIZE (1398720 / 4)
 #else
 #define FFX_BRIXELIZER_GI_CONTEXT_SIZE (210000)

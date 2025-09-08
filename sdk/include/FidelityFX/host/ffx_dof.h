@@ -58,7 +58,7 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup ffxDof
-#ifdef __clang__
+#ifdef __linux__
 #define FFX_DOF_CONTEXT_SIZE  (349096 / 4)
 #else
 #define FFX_DOF_CONTEXT_SIZE  (45674)

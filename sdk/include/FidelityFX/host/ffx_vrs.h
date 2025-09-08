@@ -57,7 +57,7 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup FfxVrs
-#ifdef __clang__
+#ifdef __linux__
 #define FFX_VRS_CONTEXT_SIZE (70088 / 4)
 #else
 #define FFX_VRS_CONTEXT_SIZE (16536)

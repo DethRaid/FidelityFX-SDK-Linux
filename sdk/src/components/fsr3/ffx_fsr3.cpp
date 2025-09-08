@@ -66,13 +66,13 @@ FfxErrorCode ffxFsr3ContextCreate(FfxFsr3Context* context, FfxFsr3ContextDescrip
     contextPrivate->backendInterfaceUpscaling = contextDescription->backendInterfaceUpscaling;
     contextPrivate->backendInterfaceFrameInterpolation = contextDescription->backendInterfaceFrameInterpolation;
 
-    bool upscalingOnly                      = (contextDescription->flags & FFX_FSR3_ENABLE_UPSCALING_ONLY) != 0;
-    bool interpolationOnly                  = (contextDescription->flags & FFX_FSR3_ENABLE_INTERPOLATION_ONLY) != 0;
+    contextPrivate->upscalingOnly           = (contextDescription->flags & FFX_FSR3_ENABLE_UPSCALING_ONLY) != 0;
+    contextPrivate->interpolationOnly       = (contextDescription->flags & FFX_FSR3_ENABLE_INTERPOLATION_ONLY) != 0;
     contextPrivate->asyncWorkloadSupported  = (contextDescription->flags & FFX_FSR3_ENABLE_ASYNC_WORKLOAD_SUPPORT) != 0;
     contextPrivate->sharedResourceCount     = contextPrivate->asyncWorkloadSupported ? FSR3_MAX_QUEUED_FRAMES : 1;
 
     // ensure upscalingOnly and interpolationOnly are not set simultaneously
-    FFX_ASSERT(upscalingOnly == false || interpolationOnly == false);
+    FFX_ASSERT(contextPrivate->upscalingOnly == false || contextPrivate->interpolationOnly == false);
 
     // validate that all callbacks are set for the backend interfaces
     if (contextPrivate->interpolationOnly)
@@ -135,7 +135,7 @@ FfxErrorCode ffxFsr3ContextCreate(FfxFsr3Context* context, FfxFsr3ContextDescrip
 
     // set up FSR3 Upscaler
     // ensure we're actually creating an FSR3 Upscaler context, not the creationfunction that reroutes to ffxFsr3ContextCreate
-    if (!interpolationOnly)
+    if (!contextPrivate->interpolationOnly)
 	{
 		FfxFsr3UpscalerContextDescription upDesc = {};
         upDesc.flags = 0;
@@ -155,7 +155,7 @@ FfxErrorCode ffxFsr3ContextCreate(FfxFsr3Context* context, FfxFsr3ContextDescrip
 		FFX_VALIDATE(ffxFsr3UpscalerContextCreate(&contextPrivate->upscalerContext, &upDesc));
 	}
 
-    if (!upscalingOnly)
+    if (!contextPrivate->upscalingOnly)
     {
 
         FfxOpticalflowContextDescription ofDescription = {};

@@ -77,7 +77,7 @@
 #define FFX_API __declspec(dllexport)
 #endif // #if defined (FFX_GCC)
 
-#ifdef __clang__
+#ifdef __linux__
 #define FFX_SDK_DEFAULT_CONTEXT_SIZE (837848 / 4)
 #else
 #define FFX_SDK_DEFAULT_CONTEXT_SIZE (1024 * 128)

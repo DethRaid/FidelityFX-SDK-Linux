@@ -57,7 +57,7 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup FfxSpd
-#ifdef __clang__
+#ifdef __linux__
 #define FFX_SPD_CONTEXT_SIZE       (70200 / 4)
 #else
 #define FFX_SPD_CONTEXT_SIZE       (9300)

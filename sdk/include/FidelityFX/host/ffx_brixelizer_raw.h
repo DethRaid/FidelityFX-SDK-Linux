@@ -57,7 +57,7 @@
 /// The size of the raw context specified in 32bit values.
 ///
 /// @ingroup ffxBrixelizer
-#ifdef __clang__
+#ifdef __linux__
 #define FFX_BRIXELIZER_RAW_CONTEXT_SIZE (12728424 / 4)
 #else
 #define FFX_BRIXELIZER_RAW_CONTEXT_SIZE (2924058)

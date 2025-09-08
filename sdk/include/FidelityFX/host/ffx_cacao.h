@@ -184,7 +184,7 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup FfxCacao
-#ifdef __clang__
+#ifdef __linux__
 #define FFX_CACAO_CONTEXT_SIZE (2302456 / 4)
 #else
 #define FFX_CACAO_CONTEXT_SIZE (301054)

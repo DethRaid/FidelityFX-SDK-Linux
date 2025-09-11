@@ -1184,7 +1184,8 @@ DWORD WINAPI composeAndPresent_presenterThread(LPVOID pParam)
                     // if no frame was presented, we still need to update the semaphore
                     if (toWait.count > 0)
                     {
-                        presenter->presentQueue.submit(VK_NULL_HANDLE, toWait, SubmissionSemaphores());
+                        auto dummySemaphores = SubmissionSemaphores();
+                        presenter->presentQueue.submit(VK_NULL_HANDLE, toWait, dummySemaphores);
                     }
 
                     numFramesSentForPresentation = entry.numFramesSentForPresentationBase + entry.numFramesToPresent;
@@ -2823,7 +2824,8 @@ VkResult FrameInterpolationSwapChainVK::submitCompositionOnGameQueue(const Pacin
         // if no frame was presented, we still need to update the semaphore
         if (toWait.count > 0)
         {
-            res = presentInfo.gameQueue.submit(VK_NULL_HANDLE, toWait, SubmissionSemaphores());
+            auto dummySemaphores = SubmissionSemaphores();
+            res = presentInfo.gameQueue.submit(VK_NULL_HANDLE, toWait, dummySemaphores);
         }
     }
 

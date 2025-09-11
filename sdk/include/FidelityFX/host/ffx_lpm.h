@@ -57,7 +57,7 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup FfxLpm
-#ifdef __clang__
+#ifdef __linux__
 #define FFX_LPM_CONTEXT_SIZE (70472 / 4)
 #else
 #define FFX_LPM_CONTEXT_SIZE (9300)

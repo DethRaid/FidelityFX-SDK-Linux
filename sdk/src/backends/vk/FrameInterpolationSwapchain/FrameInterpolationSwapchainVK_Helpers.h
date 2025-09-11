@@ -41,7 +41,7 @@ struct SubmissionSemaphores
     VkSemaphore          semaphores[Capacity];
     uint64_t             values[Capacity];
     VkPipelineStageFlags waitStages[Capacity];
-    uint32_t             count;
+    uint32_t             count = 0;
 
     SubmissionSemaphores()
     {

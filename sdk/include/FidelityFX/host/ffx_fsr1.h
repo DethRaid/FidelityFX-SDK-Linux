@@ -57,7 +57,7 @@
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup ffxFsr1
-#ifdef __clang__
+#ifdef __linux__
 #define FFX_FSR1_CONTEXT_SIZE (209632 / 4)
 #else
 #define FFX_FSR1_CONTEXT_SIZE       (27448)

@@ -23,6 +23,7 @@
 #pragma once
 
 #include <FidelityFX/host/ffx_types.h>
+#include <bit>
 
 /// @defgroup Utils Utilities
 /// Utility Macros used by the FidelityFX SDK

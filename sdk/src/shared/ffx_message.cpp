@@ -22,6 +22,7 @@
 
 #include <FidelityFX/host/ffx_message.h>
 #include <FidelityFX/host/ffx_util.h>
+#include <cstdio>
 
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
@@ -43,8 +44,8 @@ void ffxSetPrintMessageCallback(ffxMessageCallback callback, uint32_t debugLevel
 
 void ffxPrintMessage(uint32_t type, const wchar_t* message)
 {
-#ifdef _WIN32
     if (!s_messageCallback) {
+#ifdef _WIN32
         // Format the message string
         wchar_t buffer[512];
         if (type == FFX_MESSAGE_TYPE_ERROR) {
@@ -54,12 +55,14 @@ void ffxPrintMessage(uint32_t type, const wchar_t* message)
             swprintf_s(buffer, 512, L"FSR_API_DEBUG_WARNING: %ls\n", message);
         }
         OutputDebugStringW(buffer);
+#else
+        if(type == FFX_MESSAGE_TYPE_ERROR) {
+            fprintf(stderr, "FSR_API_DEBUG_ERROR: %ls\n", message);
+        } else if(type == FFX_MESSAGE_TYPE_WARNING) {
+            fprintf(stderr, "FSR_API_DEBUG_WARNING: %ls\n", message);
+        }
+#endif
     } else {
         s_messageCallback(type, message);
     }
-#else
-    FFX_UNUSED(type);
-    FFX_UNUSED(message);
-#endif
-    return;
 }

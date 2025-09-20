@@ -65,7 +65,7 @@
 #endif // #if __cplusplus >= 201703L
 #endif // #ifndef FFX_MUTEX
 
-#if defined(FFX_GCC) || !defined(FFX_BUILD_AS_DLL)
+#if defined(FFX_GCC) || defined(__linux__) || !defined(FFX_BUILD_AS_DLL)
 /// FidelityFX exported functions
 ///
 /// @ingroup Defines

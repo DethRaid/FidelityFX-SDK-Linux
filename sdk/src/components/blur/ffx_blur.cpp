@@ -229,7 +229,7 @@ static uint32_t countNumberOfSetBits(uint32_t bits)
     return count;
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 #define FFX_ASSERT_OR_RETURN(condition, falseValue) FFX_ASSERT(condition)
 

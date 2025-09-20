@@ -24,6 +24,7 @@
 
 #include <FidelityFX/host/ffx_types.h>
 #include <FidelityFX/host/ffx_util.h>
+#include <signal.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,8 +35,7 @@ extern "C" {
 /// 
 /// @ingroup ffxHost
 
-#ifdef _DEBUG
-#ifdef _WIN32
+#ifndef NDEBUG
 
 #ifdef DISABLE_FFX_DEBUG_BREAK
 #define FFX_DEBUG_BREAK \
@@ -45,12 +45,12 @@ extern "C" {
 /// Macro to force the debugger to break at this point in the code.
 /// 
 /// @ingroup Asserts
+#ifdef _WIN32
 #define FFX_DEBUG_BREAK __debugbreak();
+#elifdef __linux__
+#define FFX_DEBUG_BREAK raise(SIGINT);
 #endif
-#else
-#define FFX_DEBUG_BREAK \
-    {                   \
-    }
+
 #endif
 #else
 // don't allow debug break in release builds.
@@ -89,7 +89,7 @@ FFX_API bool ffxAssertReport(const char* file, int32_t line, const char* conditi
 /// @ingroup Asserts
 FFX_API void ffxAssertSetPrintingCallback(FfxAssertCallback callback);
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 /// Standard assert macro.
 /// 
 /// @ingroup Asserts

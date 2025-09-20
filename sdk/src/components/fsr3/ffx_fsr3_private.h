@@ -23,8 +23,10 @@
 #pragma once
 #include <FidelityFX/gpu/fsr3/ffx_fsr3_resources.h>
 #include <FidelityFX/host/ffx_fsr3upscaler.h>
+#if defined(FFX_FI)
 #include <FidelityFX/host/ffx_frameinterpolation.h>
 #include <FidelityFX/host/ffx_opticalflow.h>
+#endif
 #include <FidelityFX/host/ffx_fsr3.h>
 
 // max queued frames for descriptor management
@@ -39,8 +41,10 @@ typedef struct FfxFsr3Context_Private {
     FfxInterface                            backendInterfaceUpscaling;
     FfxInterface                            backendInterfaceFrameInterpolation;
     FfxFsr3UpscalerContext                  upscalerContext;
+#if defined(FFX_FI)
     FfxOpticalflowContext                   ofContext;
     FfxFrameInterpolationContext            fiContext;
+#endif 
     FfxResourceInternal                     sharedResources[FFX_FSR3_RESOURCE_IDENTIFIER_COUNT];
     FfxUInt32                               effectContextIdSharedResources;
     FfxUInt32                               effectContextIdFrameGeneration;
@@ -56,7 +60,9 @@ typedef struct FfxFsr3Context_Private {
     FfxResource                             dilatedMotionVectors;
     FfxResource                             reconstructedPrevNearestDepth;
 
+#if defined(FFX_FI)
     bool                                    frameGenerationEnabled;
     int32_t                                 frameGenerationFlags;
     FfxFrameInterpolationPrepareDescription fgPrepareDescriptions[FSR3_MAX_QUEUED_FRAMES];
+#endif
 } FfxFsr3Context_Private;

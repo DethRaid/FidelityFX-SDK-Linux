@@ -50,7 +50,10 @@ if (FFX_FSR3 OR FFX_ALL)
 	source_group("public_source"  FILES ${PUBLIC_SOURCES})
 
 	# Dependencies
-	target_link_libraries(ffx_fsr3_${FFX_PLATFORM_NAME} PRIVATE ffx_fsr3upscaler_${FFX_PLATFORM_NAME} ffx_opticalflow_${FFX_PLATFORM_NAME} ffx_frameinterpolation_${FFX_PLATFORM_NAME})
+	target_link_libraries(ffx_fsr3_${FFX_PLATFORM_NAME} PRIVATE ffx_fsr3upscaler_${FFX_PLATFORM_NAME})
+	if(FFX_FI)
+		target_link_libraries(ffx_fsr3_${FFX_PLATFORM_NAME} PRIVATE  ffx_opticalflow_${FFX_PLATFORM_NAME} ffx_frameinterpolation_${FFX_PLATFORM_NAME})
+	endif()
 
 	target_include_directories(ffx_fsr3_${FFX_PLATFORM_NAME} PUBLIC ${FFX_INCLUDE_PATH})
 	target_include_directories(ffx_fsr3_${FFX_PLATFORM_NAME} PUBLIC ${FFX_SHARED_PATH})

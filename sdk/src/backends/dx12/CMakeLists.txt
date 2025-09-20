@@ -99,7 +99,7 @@ if (FFX_FSR3UPSCALER OR FFX_ALL)
 	list(APPEND PUBLIC_SHADERS ${FFX_FSR3UPSCALER_PUBLIC_SHADERS})
 endif()
 
-if (FFX_FI OR FFX_ALL)
+if (FFX_FI)
 	set(FFX_FI_PRIVATE_SOURCE
 		"${FFX_SRC_BACKENDS_PATH}/shared/blob_accessors/ffx_frameinterpolation_shaderblobs.h"
 		"${FFX_SRC_BACKENDS_PATH}/shared/blob_accessors/ffx_frameinterpolation_shaderblobs.cpp")
@@ -469,7 +469,7 @@ if (FFX_FSR3UPSCALER OR FFX_ALL)
     include (CMakeShadersFSR3Upscaler.txt)
 endif()
 
-if (FFX_FI OR FFX_ALL)
+if (FFX_FI)
 	target_compile_definitions(ffx_backend_dx12_${FFX_PLATFORM_NAME} PRIVATE FFX_FI)
 	include (CMakeShadersFrameinterpolation.txt)
 endif()

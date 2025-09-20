@@ -128,7 +128,7 @@ FfxErrorCode ffxGetPermutationBlobByIndex(
         return fsr3UpscalerGetPermutationBlobByIndex((FfxFsr3UpscalerPass)passId, permutationOptions, outBlob);
 #endif // #if defined(FFX_FSR3UPSCALER) || defined(FFX_ALL)
 
-#if defined(FFX_FI) || defined(FFX_ALL)
+#if defined(FFX_FI)
 	case FFX_EFFECT_FRAMEINTERPOLATION:
 		return frameInterpolationGetPermutationBlobByIndex((FfxFrameInterpolationPass)passId, stageId, permutationOptions, outBlob);
 #endif // #if defined(FFX_FI) || defined(FFX_ALL)

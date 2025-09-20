@@ -55,7 +55,7 @@ file(GLOB PRIVATE_SOURCE
     "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
 )
 
-if(WIN32)
+if(FFX_FI)
 	file(GLOB FRAME_INTERPOLATION_SWAPCHAIN_PRIVATE_SOURCE
 			"${CMAKE_CURRENT_SOURCE_DIR}/FrameInterpolationSwapchain/*.h"
 			"${CMAKE_CURRENT_SOURCE_DIR}/FrameInterpolationSwapchain/*.cpp"
@@ -117,7 +117,7 @@ if (FFX_FSR3UPSCALER OR FFX_ALL)
 	list(APPEND PUBLIC_SHADERS ${FFX_FSR3UPSCALER_PUBLIC_SHADERS})
 endif()
 
-if (FFX_FI OR FFX_ALL)
+if (FFX_FI)
 	set(FFX_FI_PRIVATE_SOURCE
 		"${FFX_SRC_BACKENDS_PATH}/shared/blob_accessors/ffx_frameinterpolation_shaderblobs.h"
 		"${FFX_SRC_BACKENDS_PATH}/shared/blob_accessors/ffx_frameinterpolation_shaderblobs.cpp")
@@ -415,6 +415,8 @@ else()
     add_library(ffx_backend_vk_${FFX_PLATFORM_NAME} STATIC ${PRIVATE_SOURCE} ${PUBLIC_SOURCE} ${PRIVATE_SHADERS} ${PUBLIC_SHADERS})
 endif()
 
+target_compile_definitions(ffx_backend_vk_${FFX_PLATFORM_NAME} PRIVATE VK_NO_PROTOTYPES)
+
 # vk backend source
 source_group("private_source"  FILES ${PRIVATE_SOURCE})
 source_group("public_source"   FILES ${PUBLIC_SOURCE})
@@ -470,7 +472,7 @@ if (FFX_FSR3UPSCALER OR FFX_ALL)
 	include (CMakeShadersFSR3Upscaler.txt)
 endif()
 
-if (FFX_FI OR FFX_ALL)
+if (FFX_FI)
 	target_compile_definitions(ffx_backend_vk_${FFX_PLATFORM_NAME} PRIVATE FFX_FI)
 	include (CMakeShadersFrameinterpolation.txt)
 endif()

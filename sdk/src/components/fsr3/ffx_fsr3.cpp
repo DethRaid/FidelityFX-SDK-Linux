@@ -36,7 +36,9 @@
 #include <FidelityFX/gpu/ffx_core.h>
 #include <FidelityFX/gpu/fsr3/ffx_fsr3_resources.h>
 #include <ffx_object_management.h>
+#if defined(FFX_FI)
 #include "../frameinterpolation/ffx_frameinterpolation_private.h"
+#endif
 
 #include "ffx_fsr3_private.h"
 
@@ -157,7 +159,7 @@ FfxErrorCode ffxFsr3ContextCreate(FfxFsr3Context* context, FfxFsr3ContextDescrip
 
     if (!contextPrivate->upscalingOnly)
     {
-
+#if defined(FFX_FI)
         FfxOpticalflowContextDescription ofDescription = {};
         ofDescription.backendInterface                 = contextDescription->backendInterfaceFrameInterpolation;
         ofDescription.resolution                       = contextDescription->displaySize;
@@ -192,6 +194,7 @@ FfxErrorCode ffxFsr3ContextCreate(FfxFsr3Context* context, FfxFsr3ContextDescrip
             &contextDescription->backendInterfaceSharedResources, &ofResourceDescs.opticalFlowVector, contextPrivate->effectContextIdSharedResources, &contextPrivate->sharedResources[FFX_FSR3_RESOURCE_IDENTIFIER_OPTICAL_FLOW_VECTOR]));
         FFX_VALIDATE(contextDescription->backendInterfaceSharedResources.fpCreateResource(
             &contextDescription->backendInterfaceSharedResources, &ofResourceDescs.opticalFlowSCD, contextPrivate->effectContextIdSharedResources, &contextPrivate->sharedResources[FFX_FSR3_RESOURCE_IDENTIFIER_OPTICAL_FLOW_SCD_OUTPUT]));
+#endif
     }
 
     // set up FSR3Upscaler resources
@@ -245,14 +248,18 @@ FfxErrorCode ffxFsr3ContextGetGpuMemoryUsage(
 
     if (nullptr != pOpticalFlowUsage)
     {
+#if defined(FFX_FI)
         memset(pOpticalFlowUsage, 0, sizeof(FfxEffectMemoryUsage));
         ffxOpticalflowContextGetGpuMemoryUsage(&contextPrivate->ofContext, pOpticalFlowUsage);
+#endif
     }
 
     if (nullptr != pFrameGenerationUsage)
     {
+#if defined(FFX_FI)
         memset(pFrameGenerationUsage, 0, sizeof(FfxEffectMemoryUsage));
         ffxFrameInterpolationContextGetGpuMemoryUsage(&contextPrivate->fiContext, pFrameGenerationUsage);
+#endif
     }
 
     return FFX_OK;
@@ -277,6 +284,7 @@ FfxErrorCode ffxFsr3ContextGenerateReactiveMask(FfxFsr3Context* context, const F
     return ffxFsr3UpscalerContextGenerateReactiveMask(&contextPrivate->upscalerContext, &fsr3Params);
 }
 
+#if defined(FFX_FI)
 FfxErrorCode ffxFsr3DispatchFrameGeneration(const FfxFrameGenerationDispatchDescription* callbackDesc)
 {
     FfxErrorCode errorCode = FFX_OK;
@@ -363,6 +371,7 @@ FfxErrorCode ffxFsr3DispatchFrameGeneration(const FfxFrameGenerationDispatchDesc
 
     return errorCode;
 }
+#endif
 
 FfxErrorCode ffxFsr3ContextDispatchUpscale(FfxFsr3Context* context, const FfxFsr3DispatchUpscaleDescription* dispatchParams)
 {
@@ -429,6 +438,7 @@ FfxErrorCode ffxFsr3ContextDispatchUpscale(FfxFsr3Context* context, const FfxFsr
     return ret;
 }
 
+#if defined(FFX_FI)
 FfxErrorCode ffxFsr3ContextDispatchFrameGenerationPrepare(FfxFsr3Context* context, const FfxFsr3DispatchFrameGenerationPrepareDescription* dispatchParams)
 {
     FfxErrorCode            ret            = FFX_OK;
@@ -526,6 +536,7 @@ FfxErrorCode ffxFsr3ConfigureFrameGeneration(FfxFsr3Context* context, const FfxF
 
     return contextPrivate->backendInterfaceFrameInterpolation.fpSwapChainConfigureFrameGeneration(&patchedConfig);
 }
+#endif
 
 FfxErrorCode ffxFsr3ContextDestroy(FfxFsr3Context* context)
 {
@@ -542,8 +553,10 @@ FfxErrorCode ffxFsr3ContextDestroy(FfxFsr3Context* context)
 
     if (!upscalingOnly)
     {
+#if defined(FFX_FI)
         FFX_VALIDATE(ffxFrameInterpolationContextDestroy(&contextPrivate->fiContext));
         FFX_VALIDATE(ffxOpticalflowContextDestroy(&contextPrivate->ofContext));
+#endif
     }
         
     if (!interpolationOnly)

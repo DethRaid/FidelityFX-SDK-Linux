@@ -31,8 +31,9 @@
 #include <windows.h>
 #else
 #include <codecvt>  // this is deprecated so it's just a fallback solution
-#endif  // _WIN32
+#endif // _WIN32
 
+#include <array>
 #include <cmath>
 #include <cstring>
 #include <locale>
@@ -65,7 +66,7 @@ void                   BreadcrumbsPrintDeviceInfoVK(FfxInterface* backendInterfa
 void                   RegisterConstantBufferAllocatorVK(FfxInterface* backendInterface, FfxConstantBufferAllocator fpConstantAllocator);
 
 
-static VkDeviceContext sVkDeviceContext = { VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE };
+static VkDeviceContext sVkDeviceContext = { VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE, {} };
 
 #define MAX_PIPELINE_USAGE_PER_FRAME      (10) // Required to make sure passes that are called more than once per-frame don't have their descriptors overwritten.
 #define MAX_DESCRIPTOR_SET_LAYOUTS        (64)
@@ -82,7 +83,7 @@ typedef struct BackendContext_VK {
     // store for resources and resourceViews
     typedef struct Resource
     {
-#ifdef _DEBUG
+#ifndef NDEBUG
         char                    resourceName[64] = {};
 #endif
         union {
@@ -280,7 +281,7 @@ FFX_API size_t ffxGetScratchMemorySizeVK(VkPhysicalDevice physicalDevice, size_t
     uint32_t numExtensions = 0;
 
     if (physicalDevice)
-        vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &numExtensions, nullptr);
+        sVkDeviceContext.instanceFunctions.enumerateDeviceExtensionProperties(physicalDevice, nullptr, &numExtensions, nullptr);
 
     uint32_t extensionPropArraySize = sizeof(VkExtensionProperties) * numExtensions;
     uint32_t gpuJobDescArraySize = FFX_ALIGN_UP(maxContexts * FFX_MAX_GPU_JOBS * sizeof(FfxGpuJobDescription), sizeof(uint32_t));
@@ -344,7 +345,7 @@ FfxErrorCode ffxGetInterfaceVK(
     backendInterface->fpBreadcrumbsWrite = BreadcrumbsWriteVK;
     backendInterface->fpBreadcrumbsPrintDeviceInfo = BreadcrumbsPrintDeviceInfoVK;
     backendInterface->fpRegisterConstantBufferAllocator = RegisterConstantBufferAllocatorVK;
-#ifdef _WIN32
+#if defined(FFX_FI)
     backendInterface->fpSwapChainConfigureFrameGeneration = ffxSetFrameGenerationConfigToSwapchainVK;
 #endif
 
@@ -390,9 +391,9 @@ FfxResource ffxGetResourceVK(void* vkResource,
     resource.state = state;
     resource.description = ffxResDescription;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
     if (ffxResName) {
-        wcscpy_s(resource.name, ffxResName);
+        wcscpy(resource.name, ffxResName);
     }
 #endif
 
@@ -404,7 +405,7 @@ uint32_t findMemoryTypeIndex(VkPhysicalDevice physicalDevice, VkMemoryRequiremen
     FFX_ASSERT(NULL != physicalDevice);
 
     VkPhysicalDeviceMemoryProperties memProperties;
-    vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+    sVkDeviceContext.instanceFunctions.getPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 
     uint32_t bestCandidate = UINT32_MAX;
 
@@ -1261,9 +1262,9 @@ FfxConstantAllocation BackendContext_VK::FallbackConstantAllocator(void* data, F
         // allocate dynamic uniform buffer
 
         // get alignment
-        VkPhysicalDeviceProperties physicalDeviceProperties = {};
-        vkGetPhysicalDeviceProperties(physicalDevice, &physicalDeviceProperties);
-        uniformBufferAlignment = physicalDeviceProperties.limits.minUniformBufferOffsetAlignment;
+        VkPhysicalDeviceProperties2 physicalDeviceProperties = {};
+        sVkDeviceContext.instanceFunctions.getPhysicalDeviceProperties2(physicalDevice, &physicalDeviceProperties);
+        uniformBufferAlignment = physicalDeviceProperties.properties.limits.minUniformBufferOffsetAlignment;
 
         uniformBufferSize = FFX_ALIGN_UP(FFX_BUFFER_SIZE, uniformBufferAlignment) * maxEffectContexts * FFX_MAX_PASS_COUNT * FFX_MAX_QUEUED_FRAMES;
 
@@ -1453,9 +1454,10 @@ FfxErrorCode CreateBackendContextVK(FfxInterface* backendInterface, FfxEffect ef
         // Map extension array
         backendContext->extensionProperties = (VkExtensionProperties*)pMem;
 
-        // if vkGetDeviceProcAddr is NULL, use the one from the vulkan header
-        if (vkDeviceContext->vkDeviceProcAddr == NULL)
-            vkDeviceContext->vkDeviceProcAddr = vkGetDeviceProcAddr;
+        // if vkGetDeviceProcAddr is NULL, the user made a mistake
+        if (vkDeviceContext->vkDeviceProcAddr == nullptr) {
+            return FFX_ERROR_INVALID_POINTER;
+        }
 
         if (vkDeviceContext->vkDevice != VK_NULL_HANDLE) {
             backendContext->device = vkDeviceContext->vkDevice;
@@ -1517,13 +1519,13 @@ FfxErrorCode CreateBackendContextVK(FfxInterface* backendInterface, FfxEffect ef
 
         // enumerate all the device extensions
         backendContext->numDeviceExtensions = 0;
-        vkEnumerateDeviceExtensionProperties(backendContext->physicalDevice, nullptr, &backendContext->numDeviceExtensions, nullptr);
-        vkEnumerateDeviceExtensionProperties(backendContext->physicalDevice, nullptr, &backendContext->numDeviceExtensions, backendContext->extensionProperties);
+        sVkDeviceContext.instanceFunctions.enumerateDeviceExtensionProperties(backendContext->physicalDevice, nullptr, &backendContext->numDeviceExtensions, nullptr);
+        sVkDeviceContext.instanceFunctions.enumerateDeviceExtensionProperties(backendContext->physicalDevice, nullptr, &backendContext->numDeviceExtensions, backendContext->extensionProperties);
 
         // create a global descriptor pool to hold all descriptors we'll need
         VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
-        VkDescriptorPoolSize poolSizes[] = {
-            { VK_DESCRIPTOR_TYPE_SAMPLER, backendContext->maxEffectContexts * FFX_MAX_RESOURCE_COUNT * FFX_MAX_PASS_COUNT * FFX_MAX_QUEUED_FRAMES * MAX_PIPELINE_USAGE_PER_FRAME },
+        const auto poolSizes = std::array<VkDescriptorPoolSize, 6>{
+            VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_SAMPLER, backendContext->maxEffectContexts * FFX_MAX_RESOURCE_COUNT * FFX_MAX_PASS_COUNT * FFX_MAX_QUEUED_FRAMES * MAX_PIPELINE_USAGE_PER_FRAME },
             { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, backendContext->maxEffectContexts * FFX_MAX_RESOURCE_COUNT * FFX_MAX_PASS_COUNT * FFX_MAX_QUEUED_FRAMES * MAX_PIPELINE_USAGE_PER_FRAME },
             { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, backendContext->maxEffectContexts * FFX_MAX_RESOURCE_COUNT * FFX_MAX_PASS_COUNT * FFX_MAX_QUEUED_FRAMES * MAX_PIPELINE_USAGE_PER_FRAME },
             { VK_DESCRIPTOR_TYPE_SAMPLER, backendContext->maxEffectContexts * FFX_MAX_RESOURCE_COUNT * FFX_MAX_PASS_COUNT * FFX_MAX_QUEUED_FRAMES * MAX_PIPELINE_USAGE_PER_FRAME },
@@ -1534,8 +1536,8 @@ FfxErrorCode CreateBackendContextVK(FfxInterface* backendInterface, FfxEffect ef
         descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         descriptorPoolCreateInfo.pNext = nullptr;
         descriptorPoolCreateInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        descriptorPoolCreateInfo.poolSizeCount = 5;
-        descriptorPoolCreateInfo.pPoolSizes = poolSizes;
+        descriptorPoolCreateInfo.poolSizeCount = poolSizes.size();
+        descriptorPoolCreateInfo.pPoolSizes = poolSizes.data();
         descriptorPoolCreateInfo.maxSets = backendContext->maxEffectContexts * FFX_MAX_PASS_COUNT * MAX_PIPELINE_USAGE_PER_FRAME * FFX_MAX_QUEUED_FRAMES;
 
         if (backendContext->vkFunctionTable.vkCreateDescriptorPool(backendContext->device, &descriptorPoolCreateInfo, nullptr, &backendContext->descriptorPool) != VK_SUCCESS) {
@@ -1548,9 +1550,11 @@ FfxErrorCode CreateBackendContextVK(FfxInterface* backendInterface, FfxEffect ef
         // allocate dynamic uniform buffer
         {
             // get alignment
-            VkPhysicalDeviceProperties physicalDeviceProperties = {};
-            vkGetPhysicalDeviceProperties(backendContext->physicalDevice, &physicalDeviceProperties);
-            backendContext->uniformBufferAlignment = physicalDeviceProperties.limits.minUniformBufferOffsetAlignment;
+            VkPhysicalDeviceProperties2 physicalDeviceProperties = {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2
+            };
+            sVkDeviceContext.instanceFunctions.getPhysicalDeviceProperties2(backendContext->physicalDevice, &physicalDeviceProperties);
+            backendContext->uniformBufferAlignment = physicalDeviceProperties.properties.limits.minUniformBufferOffsetAlignment;
 
             backendContext->uniformBufferSize =
                 FFX_ALIGN_UP(FFX_BUFFER_SIZE, backendContext->uniformBufferAlignment) * backendContext->maxEffectContexts * FFX_MAX_PASS_COUNT * FFX_MAX_QUEUED_FRAMES;
@@ -1640,7 +1644,7 @@ FfxErrorCode CreateBackendContextVK(FfxInterface* backendInterface, FfxEffect ef
             bufferInfo.pQueueFamilyIndices = nullptr;
 
             VkBuffer testBuffer = VK_NULL_HANDLE;
-            if (vkCreateBuffer(backendContext->device, &bufferInfo, nullptr, &testBuffer) != VK_SUCCESS)
+            if (backendContext->vkFunctionTable.vkCreateBuffer(backendContext->device, &bufferInfo, nullptr, &testBuffer) != VK_SUCCESS)
             {
                 FFX_ASSERT_FAIL("Cannot create test Breadcrumbs buffer to find memory requirements!");
                 return FFX_ERROR_BACKEND_API_ERROR;
@@ -1680,7 +1684,7 @@ FfxErrorCode CreateBackendContextVK(FfxInterface* backendInterface, FfxEffect ef
 
             // Find proper memory index for created buffers
             VkPhysicalDeviceMemoryProperties memoryProps = {};
-            vkGetPhysicalDeviceMemoryProperties(backendContext->physicalDevice, &memoryProps);
+            sVkDeviceContext.instanceFunctions.getPhysicalDeviceMemoryProperties(backendContext->physicalDevice, &memoryProps);
 
             const VkMemoryPropertyFlags requiredMemoryFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
             VkMemoryPropertyFlags preferredFlags = VK_MEMORY_PROPERTY_HOST_CACHED_BIT;
@@ -2005,7 +2009,7 @@ FfxErrorCode GetDeviceCapabilitiesVK(FfxInterface* backendInterface, FfxDeviceCa
             VkPhysicalDeviceProperties2 deviceProperties2 = {};
             deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
             deviceProperties2.pNext = &subgroupSizeControlProperties;
-            vkGetPhysicalDeviceProperties2(context->physicalDevice, &deviceProperties2);
+            sVkDeviceContext.instanceFunctions.getPhysicalDeviceProperties2(context->physicalDevice, &deviceProperties2);
 
             deviceCapabilities->waveLaneCountMin = subgroupSizeControlProperties.minSubgroupSize;
             deviceCapabilities->waveLaneCountMax = subgroupSizeControlProperties.maxSubgroupSize;
@@ -2020,7 +2024,7 @@ FfxErrorCode GetDeviceCapabilitiesVK(FfxInterface* backendInterface, FfxDeviceCa
             physicalDeviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
             physicalDeviceFeatures2.pNext = &shaderFloat18Int8Features;
 
-            vkGetPhysicalDeviceFeatures2(context->physicalDevice, &physicalDeviceFeatures2);
+            sVkDeviceContext.instanceFunctions.getPhysicalDeviceFeatures2(context->physicalDevice, &physicalDeviceFeatures2);
 
             deviceCapabilities->fp16Supported = (bool)shaderFloat18Int8Features.shaderFloat16;
         }
@@ -2034,7 +2038,7 @@ FfxErrorCode GetDeviceCapabilitiesVK(FfxInterface* backendInterface, FfxDeviceCa
             physicalDeviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
             physicalDeviceFeatures2.pNext = &accelerationStructureFeatures;
 
-            vkGetPhysicalDeviceFeatures2(context->physicalDevice, &physicalDeviceFeatures2);
+            sVkDeviceContext.instanceFunctions.getPhysicalDeviceFeatures2(context->physicalDevice, &physicalDeviceFeatures2);
 
             deviceCapabilities->raytracingSupported = (bool)accelerationStructureFeatures.accelerationStructure;
         }
@@ -2048,7 +2052,7 @@ FfxErrorCode GetDeviceCapabilitiesVK(FfxInterface* backendInterface, FfxDeviceCa
             physicalDeviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
             physicalDeviceFeatures2.pNext = &coherentMemoryFeatures;
 
-            vkGetPhysicalDeviceFeatures2(context->physicalDevice, &physicalDeviceFeatures2);
+            sVkDeviceContext.instanceFunctions.getPhysicalDeviceFeatures2(context->physicalDevice, &physicalDeviceFeatures2);
 
             deviceCapabilities->deviceCoherentMemorySupported = (bool)coherentMemoryFeatures.deviceCoherentMemory;
         }
@@ -2072,7 +2076,7 @@ FfxErrorCode GetDeviceCapabilitiesVK(FfxInterface* backendInterface, FfxDeviceCa
             physicalDeviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
             physicalDeviceFeatures2.pNext = &synchronizationFeatures;
 
-            vkGetPhysicalDeviceFeatures2(context->physicalDevice, &physicalDeviceFeatures2);
+            sVkDeviceContext.instanceFunctions.getPhysicalDeviceFeatures2(context->physicalDevice, &physicalDeviceFeatures2);
 
             deviceCapabilities->extendedSynchronizationSupported = (bool)synchronizationFeatures.synchronization2;
         }
@@ -2086,7 +2090,7 @@ FfxErrorCode GetDeviceCapabilitiesVK(FfxInterface* backendInterface, FfxDeviceCa
             physicalDeviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
             physicalDeviceFeatures2.pNext = &descriptorIndexingFeatures;
 
-            vkGetPhysicalDeviceFeatures2(context->physicalDevice, &physicalDeviceFeatures2);
+            sVkDeviceContext.instanceFunctions.getPhysicalDeviceFeatures2(context->physicalDevice, &physicalDeviceFeatures2);
 
             deviceCapabilities->shaderStorageBufferArrayNonUniformIndexing = (bool)descriptorIndexingFeatures.shaderStorageBufferArrayNonUniformIndexing;
         }
@@ -2242,9 +2246,8 @@ FfxErrorCode CreateResourceVK(
     backendResource->initialState = resourceState;
     backendResource->currentState = resourceState;
 
-#ifdef _DEBUG
-    size_t retval = 0;
-    wcstombs_s(&retval, backendResource->resourceName, sizeof(backendResource->resourceName), createResourceDescription->name, sizeof(backendResource->resourceName));
+#ifndef NDEBUG
+    size_t retval = wcstombs(backendResource->resourceName, createResourceDescription->name, sizeof(backendResource->resourceName));
     if (retval >= 64) backendResource->resourceName[63] = '\0';
 #endif
 
@@ -2273,7 +2276,7 @@ FfxErrorCode CreateResourceVK(
             return FFX_ERROR_BACKEND_API_ERROR;
         }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
         setVKObjectName(backendContext->vkFunctionTable, backendContext->device, VK_OBJECT_TYPE_BUFFER, (uint64_t)backendResource->bufferResource, backendResource->resourceName);
 #endif
 
@@ -2353,7 +2356,7 @@ FfxErrorCode CreateResourceVK(
             return FFX_ERROR_BACKEND_API_ERROR;
         }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
         setVKObjectName(backendContext->vkFunctionTable, backendContext->device, VK_OBJECT_TYPE_IMAGE, (uint64_t)backendResource->imageResource, backendResource->resourceName);
 #endif
 
@@ -2432,7 +2435,7 @@ FfxErrorCode CreateResourceVK(
         if (backendContext->vkFunctionTable.vkCreateImageView(backendContext->device, &imageViewCreateInfo, NULL, &backendContext->pResourceViews[backendResource->srvViewIndex].imageView) != VK_SUCCESS) {
             return FFX_ERROR_BACKEND_API_ERROR;
         }
-#ifdef _DEBUG
+#ifndef NDEBUG
         setVKObjectName(backendContext->vkFunctionTable, backendContext->device, VK_OBJECT_TYPE_IMAGE_VIEW, (uint64_t)backendContext->pResourceViews[backendResource->srvViewIndex].imageView, backendResource->resourceName);
 #endif
 
@@ -2455,7 +2458,7 @@ FfxErrorCode CreateResourceVK(
                 if (backendContext->vkFunctionTable.vkCreateImageView(backendContext->device, &imageViewCreateInfo, NULL, &backendContext->pResourceViews[backendResource->uavViewIndex + mip].imageView) != VK_SUCCESS) {
                     return FFX_ERROR_BACKEND_API_ERROR;
                 }
-#ifdef _DEBUG
+#ifndef NDEBUG
                 setVKObjectName(backendContext->vkFunctionTable, backendContext->device, VK_OBJECT_TYPE_IMAGE_VIEW, (uint64_t)backendContext->pResourceViews[backendResource->uavViewIndex + mip].imageView, backendResource->resourceName);
 #endif
             }
@@ -2678,9 +2681,8 @@ FfxErrorCode RegisterResourceVK(
 
     copyResourceState(backendResource, inFfxResource);
 
-#ifdef _DEBUG
-    size_t retval = 0;
-    wcstombs_s(&retval, backendResource->resourceName, sizeof(backendResource->resourceName), inFfxResource->name, sizeof(backendResource->resourceName));
+#ifndef NDEBUG
+    size_t retval = wcstombs(backendResource->resourceName, inFfxResource->name, sizeof(backendResource->resourceName));
     if (retval >= 64) backendResource->resourceName[63] = '\0';
 #endif
 
@@ -2744,7 +2746,7 @@ FfxErrorCode RegisterResourceVK(
         if (backendContext->vkFunctionTable.vkCreateImageView(backendContext->device, &imageViewCreateInfo, NULL, &backendContext->pResourceViews[backendResource->srvViewIndex].imageView) != VK_SUCCESS) {
             return FFX_ERROR_BACKEND_API_ERROR;
         }
-#ifdef _DEBUG
+#ifndef NDEBUG
         setVKObjectName(backendContext->vkFunctionTable, backendContext->device, VK_OBJECT_TYPE_IMAGE_VIEW, (uint64_t)backendContext->pResourceViews[backendResource->srvViewIndex].imageView, backendResource->resourceName);
 #endif
 
@@ -2767,7 +2769,7 @@ FfxErrorCode RegisterResourceVK(
                 if (backendContext->vkFunctionTable.vkCreateImageView(backendContext->device, &imageViewCreateInfo, NULL, &backendContext->pResourceViews[backendResource->uavViewIndex + mip].imageView) != VK_SUCCESS) {
                     return FFX_ERROR_BACKEND_API_ERROR;
                 }
-#ifdef _DEBUG
+#ifndef NDEBUG
                 setVKObjectName(backendContext->vkFunctionTable, backendContext->device, VK_OBJECT_TYPE_IMAGE_VIEW, (uint64_t)backendContext->pResourceViews[backendResource->uavViewIndex + mip].imageView, backendResource->resourceName);
 #endif
             }
@@ -2804,7 +2806,7 @@ FfxResource GetResourceVK(FfxInterface* backendInterface, FfxResourceInternal in
     resource.state = backendContext->pResources[inResource.internalIndex].currentState;
     resource.description = ffxResDescription;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
     if (backendContext->pResources[inResource.internalIndex].resourceName)
     {
         ConvertUTF8ToUTF16(backendContext->pResources[inResource.internalIndex].resourceName, resource.name, 64);
@@ -2926,10 +2928,10 @@ FfxErrorCode registerStaticTextureSrv(BackendContext_VK* backendContext, const F
             return FFX_ERROR_BACKEND_API_ERROR;
         }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
         size_t retval = 0;
         char   resourceName[64];
-        wcstombs_s(&retval, resourceName, sizeof(resourceName), inResource->name, sizeof(resourceName));
+        retval = wcstombs(resourceName, inResource->name, sizeof(resourceName));
         if (retval >= 64) resourceName[63] = '\0';
 
         setVKObjectName(backendContext->vkFunctionTable,
@@ -3077,10 +3079,10 @@ FfxErrorCode registerStaticTextureUav(BackendContext_VK* backendContext, const F
             return FFX_ERROR_BACKEND_API_ERROR;
         }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
         size_t retval = 0;
         char   resourceName[64];
-        wcstombs_s(&retval, resourceName, sizeof(resourceName), inResource->name, sizeof(resourceName));
+        retval = wcstombs(resourceName, inResource->name, sizeof(resourceName));
         if (retval >= 64) resourceName[63] = '\0';
 
         setVKObjectName(backendContext->vkFunctionTable,
@@ -4352,10 +4354,13 @@ void BreadcrumbsPrintDeviceInfoVK(
     char* buff = *printBuffer;
     size_t buffSize = *printSize;
 
-    VkPhysicalDeviceProperties devProps = {};
-    VkPhysicalDeviceFeatures devFeatures = {};
-    vkGetPhysicalDeviceProperties(backendContext->physicalDevice, &devProps);
-    vkGetPhysicalDeviceFeatures(backendContext->physicalDevice, &devFeatures);
+    VkPhysicalDeviceProperties2 devProps2 = {};
+    VkPhysicalDeviceFeatures2 devFeatures2 = {};
+    sVkDeviceContext.instanceFunctions.getPhysicalDeviceProperties2(backendContext->physicalDevice, &devProps2);
+    sVkDeviceContext.instanceFunctions.getPhysicalDeviceFeatures2(backendContext->physicalDevice, &devFeatures2);
+
+    const auto& devProps = devProps2.properties;
+    const auto& devFeatures = devFeatures2.features;
 
     FFX_BREADCRUMBS_APPEND_STRING(buff, buffSize, "[VkPhysicalDeviceProperties]\n" FFX_BREADCRUMBS_PRINTING_INDENT "apiVersion: ");
     FFX_BREADCRUMBS_APPEND_UINT(buff, buffSize, VK_API_VERSION_MAJOR(devProps.apiVersion));

@@ -28,8 +28,10 @@
 /// @ingroup ffxSDK
 #include <FidelityFX/host/ffx_fsr3.h>
 #include <FidelityFX/host/ffx_fsr3upscaler.h>
+#if defined(FFX_FI)
 #include <FidelityFX/host/ffx_frameinterpolation.h>
 #include <FidelityFX/host/ffx_opticalflow.h>
+#endif
 #include <FidelityFX/host/ffx_fsr2.h>
 #include <FidelityFX/host/ffx_fsr1.h>
 #include <FidelityFX/host/ffx_spd.h>

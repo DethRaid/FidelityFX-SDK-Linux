@@ -21,14 +21,14 @@
 // THE SOFTWARE.
 
 #include <FidelityFX/host/ffx_assert.h>
-#include <stdlib.h>  // for malloc()
+#include <cstdio> // for snprintf
+#include <stdlib.h> // for malloc()
 
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>  // required for OutputDebugString()
-#include <stdio.h>    // required for sprintf_s
 #endif                // #ifndef _WIN32
 
 static FfxAssertCallback s_assertCallback;
@@ -37,46 +37,40 @@ static FfxAssertCallback s_assertCallback;
 void ffxAssertSetPrintingCallback(FfxAssertCallback callback)
 {
     s_assertCallback = callback;
-    return;
 }
 
 // implementation of assert reporting
 bool ffxAssertReport(const char* file, int32_t line, const char* condition, const char* message)
 {
     if (!file) {
-
         return true;
     }
 
-#ifdef _WIN32
     // form the final assertion string and output to the TTY.
     const size_t bufferSize = snprintf(NULL, 0, "%s(%d): ASSERTION FAILED. %s\n", file, line, message ? message : condition) + 1;
     char*        tempBuf    = (char*)malloc(bufferSize);
     if (!tempBuf) {
-
         return true;
     }
 
     if (!message) {
-        sprintf_s(tempBuf, bufferSize, "%s(%d): ASSERTION FAILED. %s\n", file, line, condition);
+        sprintf(tempBuf, "%s(%d): ASSERTION FAILED. %s\n", file, line, condition);
     } else {
-        sprintf_s(tempBuf, bufferSize, "%s(%d): ASSERTION FAILED. %s\n", file, line, message);
+        sprintf(tempBuf, "%s(%d): ASSERTION FAILED. %s\n", file, line, message);
     }
 
     if (!s_assertCallback) {
+#ifdef _WIN32
         OutputDebugStringA(tempBuf);
+#else
+        fprintf(stderr, "%s", tempBuf);
+#endif
     } else {
         s_assertCallback(tempBuf);
     }
 
     // free the buffer.
     free(tempBuf);
-
-#else
-    FFX_UNUSED(line);
-    FFX_UNUSED(condition);
-    FFX_UNUSED(message);
-#endif
 
     return true;
 }

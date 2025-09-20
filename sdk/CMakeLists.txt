@@ -22,6 +22,8 @@
 
 cmake_minimum_required(VERSION 3.23)
 
+# FSR3 frame interpolation is now opt-in, because I don't want to deal with it. PRs are welcome!
+
 if(POLICY CMP0147)
 	# parallel custom command builds (used for shader compilation)
 	cmake_policy(SET CMP0147 NEW)
@@ -153,7 +155,7 @@ endif()
 
 if (FFX_FSR3)
 	option(FFX_FSR3UPSCALER "Build FFX FSR3 Upscaler API" ON)
-	option(FFX_FI "Build FFX Frame Interpolation API" ON)
+	option(FFX_FI "Build FFX Frame Interpolation API" OFF)
 	option(FFX_OF "Build FFX Optical Flow API" ON)
 endif()
 
@@ -177,8 +179,7 @@ endif()
 if(WIN32)
 set(FFX_SC_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/tools/binary_store/FidelityFX_SC.exe)
 elseif(LINUX)
-# we need to turn off bash brace expansion because amd uses {} for shader pemutations
-set(FFX_SC_EXECUTABLE "set -B;${CMAKE_CURRENT_SOURCE_DIR}/tools/binary_store/FidelityFX_SC")
+set(FFX_SC_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/tools/binary_store/FidelityFX_SC)
 else()
 message(FATAL_ERROR "shader compilation is only supported on windows and linux sorry")
 endif()
@@ -242,11 +243,6 @@ elseif(FFX_API_BACKEND STREQUAL GDK_XBOXONE_X64)
 else()
 	# This is likely a custom include
 	project (FidelityFX-SDK)
-endif()
-
-# compatibility problems
-if(NOT MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdeclspec")
 endif()
 
 # Components

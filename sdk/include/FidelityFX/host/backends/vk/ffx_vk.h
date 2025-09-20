@@ -73,6 +73,13 @@ typedef struct VkFrameInterpolationInfoFFX
     const VkAllocationCallbacks* pAllocator;
 } VkFrameInterpolationInfoFFX;
 
+    struct VkInstanceFunctionTableFFX {
+        PFN_vkGetPhysicalDeviceFeatures2 getPhysicalDeviceFeatures2 = nullptr;
+        PFN_vkEnumerateDeviceExtensionProperties enumerateDeviceExtensionProperties = nullptr;
+        PFN_vkGetPhysicalDeviceMemoryProperties getPhysicalDeviceMemoryProperties = nullptr;
+        PFN_vkGetPhysicalDeviceProperties2 getPhysicalDeviceProperties2 = nullptr;
+    };
+
 /// Query how much memory is required for the Vulkan backend's scratch buffer.
 /// 
 /// @param [in] physicalDevice              A pointer to the VkPhysicalDevice device.
@@ -90,6 +97,7 @@ typedef struct VkDeviceContext {
     VkDevice                vkDevice;           /// The Vulkan device
     VkPhysicalDevice        vkPhysicalDevice;   /// The Vulkan physical device
     PFN_vkGetDeviceProcAddr vkDeviceProcAddr;   /// The device's function address table
+    VkInstanceFunctionTableFFX instanceFunctions;   // the instance's function table
 } VkDeviceContext;
 
 /// Create a <c><i>FfxDevice</i></c> from a <c><i>VkDevice</i></c>.
@@ -260,7 +268,7 @@ FFX_API FfxErrorCode ffxReplaceSwapchainForFrameinterpolationVK(FfxCommandQueue 
 /// @ingroup VKFrameInterpolation
 FFX_API FfxErrorCode ffxWaitForPresents(FfxSwapchain gameSwapChain);
 
-#ifdef _WIN32
+#if defined(FFX_FI)
 /// Registers a <c><i>FfxResource</i></c> to use for UI with the provided <c><i>FfxSwapchain</i></c>.
 ///
 /// @param [in] gameSwapChain           The <c><i>FfxSwapchain</i></c> to to register the UI resource with.

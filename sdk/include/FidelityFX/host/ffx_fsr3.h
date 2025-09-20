@@ -27,8 +27,10 @@
 // Include the interface for the backend of the FSR3 API.
 #include <FidelityFX/host/ffx_interface.h>
 #include <FidelityFX/host/ffx_fsr3upscaler.h>
+#if FFX_FI
 #include <FidelityFX/host/ffx_frameinterpolation.h>
 #include <FidelityFX/host/ffx_opticalflow.h>
+#endif
 
 /// FidelityFX Super Resolution 3 major version.
 ///
@@ -50,12 +52,20 @@
 /// Defines the number of internal effect contexts required by FSR3 (+1 for proxy swapchain)
 ///
 /// @ingroup ffxFsr3
+#if defined(FFX_FI)
 #define FFX_FSR3_CONTEXT_COUNT (FFX_FSR3UPSCALER_CONTEXT_COUNT + FFX_OPTICALFLOW_CONTEXT_COUNT + FFX_FRAMEINTERPOLATION_CONTEXT_COUNT + 1)
+#else
+#define FFX_FSR3_CONTEXT_COUNT (FFX_FSR3UPSCALER_CONTEXT_COUNT + 1)
+#endif
 
 /// The size of the context specified in 32bit values.
 ///
 /// @ingroup FSR3
+#if defined(FFX_FI)
 #define FFX_FSR3_CONTEXT_SIZE (FFX_FSR3UPSCALER_CONTEXT_SIZE + FFX_OPTICALFLOW_CONTEXT_SIZE + FFX_FRAMEINTERPOLATION_CONTEXT_SIZE + FFX_SDK_DEFAULT_CONTEXT_SIZE)
+#else
+#define FFX_FSR3_CONTEXT_SIZE (FFX_FSR3UPSCALER_CONTEXT_SIZE + FFX_SDK_DEFAULT_CONTEXT_SIZE)
+#endif
 
 #if defined(__cplusplus)
 extern "C" {
@@ -135,12 +145,14 @@ typedef enum FfxFsr3InitializationFlagBits {
     FFX_FSR3_ENABLE_INTERPOLATION_ONLY                  = (1<<13),
 } FfxFsr3InitializationFlagBits;
 
+#if defined(FFX_FI)
 typedef enum FfxFsr3FrameGenerationFlags
 {
     FFX_FSR3_FRAME_GENERATION_FLAG_DRAW_DEBUG_TEAR_LINES    = FFX_FRAMEINTERPOLATION_DISPATCH_DRAW_DEBUG_TEAR_LINES,  ///< A bit indicating that the debug tear lines will be drawn to the interpolated output.
     FFX_FSR3_FRAME_GENERATION_FLAG_DRAW_DEBUG_VIEW          = FFX_FRAMEINTERPOLATION_DISPATCH_DRAW_DEBUG_VIEW,  ///< A bit indicating that the interpolated output resource will contain debug views with relevant information.
     FFX_FSR3_FRAME_GENERATION_FLAG_DRAW_DEBUG_PACING_LINES  = FFX_FRAMEINTERPOLATION_DISPATCH_DRAW_DEBUG_PACING_LINES  ///< A bit indicating that the debug pacing lines will be drawn to the generated output.
 } FfxFsr3FrameGenerationFlags;
+#endif
 
 typedef enum FfxFsr3UpscalingFlags
 {

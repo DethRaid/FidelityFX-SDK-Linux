@@ -65,7 +65,7 @@ layout (set = 0, binding = 1000) uniform sampler s_LinearClamp;
 
 // SRVs
 #if defined FFX_SPD_BIND_SRV_INPUT_DOWNSAMPLE_SRC
-    layout (set = 0, binding = FFX_SPD_BIND_SRV_INPUT_DOWNSAMPLE_SRC)  uniform texture2DArray  r_input_downsample_src;
+    layout (set = 0, binding = FFX_SPD_BIND_SRV_INPUT_DOWNSAMPLE_SRC)  uniform texture2D  r_input_downsample_src;
 #endif
 
 // UAV declarations
@@ -77,11 +77,11 @@ layout (set = 0, binding = 1000) uniform sampler s_LinearClamp;
 #endif
 
 #if defined FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MID_MIPMAP
-    layout (set = 0, binding = FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MID_MIPMAP, rgba32f)  coherent uniform image2DArray  rw_input_downsample_src_mid_mip;
+    layout (set = 0, binding = FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MID_MIPMAP, rgba32f)  coherent uniform image2D  rw_input_downsample_src_mid_mip;
 #endif
 
 #if defined FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MIPS
-    layout (set = 0, binding = FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MIPS, rgba32f)                 uniform image2DArray  rw_input_downsample_src_mips[SPD_MAX_MIP_LEVELS+1];
+    layout (set = 0, binding = FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MIPS, rgba32f)                 uniform image2D  rw_input_downsample_src_mips[SPD_MAX_MIP_LEVELS+1];
 #endif
 
 #if FFX_HALF
@@ -90,7 +90,7 @@ layout (set = 0, binding = 1000) uniform sampler s_LinearClamp;
     FfxFloat16x4 SampleSrcImageH(FfxFloat32x2 uv, FfxUInt32 slice)
     {
         FfxFloat32x2 textureCoord = FfxFloat32x2(uv) * InvInputSize() + InvInputSize();
-        FfxFloat32x4 result = textureLod(sampler2DArray(r_input_downsample_src, s_LinearClamp), FfxFloat32x3(textureCoord, slice), 0);
+        FfxFloat32x4 result = textureLod(sampler2D(r_input_downsample_src, s_LinearClamp), textureCoord, 0);
         return FfxFloat16x4(ffxSrgbFromLinear(result.x), ffxSrgbFromLinear(result.y), ffxSrgbFromLinear(result.z), result.w);
     }
 #endif // defined(FFX_SPD_BIND_SRV_INPUT_DOWNSAMPLE_SRC)
@@ -98,28 +98,28 @@ layout (set = 0, binding = 1000) uniform sampler s_LinearClamp;
 #if defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MIPS)
     FfxFloat16x4 LoadSrcImageH(FfxFloat32x2 uv, FfxUInt32 slice)
     {
-        return FfxFloat16x4(imageLoad(rw_input_downsample_src_mips[0], FfxInt32x3(uv, slice)));
+        return FfxFloat16x4(imageLoad(rw_input_downsample_src_mips[0], FfxInt32x2(uv)));
     }
 #endif // defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MIPS)
 
 #if defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MIPS)
     void StoreSrcMipH(FfxFloat16x4 value, FfxInt32x2 uv, FfxUInt32 slice, FfxUInt32 mip)
     {
-        imageStore(rw_input_downsample_src_mips[mip], FfxInt32x3(uv, slice), FfxFloat32x4(value));
+        imageStore(rw_input_downsample_src_mips[mip], uv, FfxFloat32x4(value));
     }
 #endif // defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MIPS)
 
 #if defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MID_MIPMAP)
     FfxFloat16x4 LoadMidMipH(FfxInt32x2 uv, FfxUInt32 slice)
     {
-        return FfxFloat16x4(imageLoad(rw_input_downsample_src_mid_mip, FfxInt32x3(uv, slice)));
+        return FfxFloat16x4(imageLoad(rw_input_downsample_src_mid_mip, uv));
     }
 #endif // defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MID_MIPMAP)
 
 #if defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MID_MIPMAP)
     void StoreMidMipH(FfxFloat16x4 value, FfxInt32x2 uv, FfxUInt32 slice)
     {
-        imageStore(rw_input_downsample_src_mid_mip, FfxInt32x3(uv, slice), FfxFloat32x4(value));\
+        imageStore(rw_input_downsample_src_mid_mip, uv, FfxFloat32x4(value));\
     }
 #endif // defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MID_MIPMAP)
 
@@ -129,7 +129,7 @@ layout (set = 0, binding = 1000) uniform sampler s_LinearClamp;
     FfxFloat32x4 SampleSrcImage(FfxInt32x2 uv, FfxUInt32 slice)
     {
         FfxFloat32x2 textureCoord = FfxFloat32x2(uv) * InvInputSize() + InvInputSize();
-        FfxFloat32x4 result = textureLod(sampler2DArray(r_input_downsample_src, s_LinearClamp), FfxFloat32x3(textureCoord, slice), 0);
+        FfxFloat32x4 result = textureLod(sampler2D(r_input_downsample_src, s_LinearClamp), textureCoord, 0);
         return FfxFloat32x4(ffxSrgbFromLinear(result.x), ffxSrgbFromLinear(result.y), ffxSrgbFromLinear(result.z), result.w);
     }
 #endif // defined(FFX_SPD_BIND_SRV_INPUT_DOWNSAMPLE_SRC)
@@ -137,28 +137,28 @@ layout (set = 0, binding = 1000) uniform sampler s_LinearClamp;
 #if defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MIPS)
     FfxFloat32x4 LoadSrcImage(FfxInt32x2 uv, FfxUInt32 slice)
     {
-        return imageLoad(rw_input_downsample_src_mips[0], FfxInt32x3(uv, slice));
+        return imageLoad(rw_input_downsample_src_mips[0], uv);
     }
 #endif // defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MIPS)
 
 #if defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MIPS)
     void StoreSrcMip(FfxFloat32x4 value, FfxInt32x2 uv, FfxUInt32 slice, FfxUInt32 mip)
     {
-        imageStore(rw_input_downsample_src_mips[mip], FfxInt32x3(uv, slice), value);
+        imageStore(rw_input_downsample_src_mips[mip], uv, value);
     }
 #endif // defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MIPS)
 
 #if defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MID_MIPMAP)
     FfxFloat32x4 LoadMidMip(FfxInt32x2 uv, FfxUInt32 slice)
     {
-        return imageLoad(rw_input_downsample_src_mid_mip, FfxInt32x3(uv, slice));
+        return imageLoad(rw_input_downsample_src_mid_mip, uv);
     }
 #endif // defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MID_MIPMAP)
 
 #if defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MID_MIPMAP)
     void StoreMidMip(FfxFloat32x4 value, FfxInt32x2 uv, FfxUInt32 slice)
     {
-        imageStore(rw_input_downsample_src_mid_mip, FfxInt32x3(uv, slice), value);
+        imageStore(rw_input_downsample_src_mid_mip, uv, value);
     }
 #endif // defined(FFX_SPD_BIND_UAV_INPUT_DOWNSAMPLE_SRC_MID_MIPMAP)
 

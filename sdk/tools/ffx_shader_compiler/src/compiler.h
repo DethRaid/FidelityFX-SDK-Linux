@@ -119,7 +119,7 @@ struct Permutation
     std::string                         hashDigest;                 ///< Shader permutation hash key.
     std::string                         name;                       ///< Shader permutation name.
     std::string                         headerFileName;             ///< Shader permutation header file name.
-    std::vector<std::wstring>           defines;                    ///< Shader permutation defines.
+    std::vector<std::string>            defines;                    ///< Shader permutation defines.
     std::shared_ptr<IShaderBinary>      shaderBinary = nullptr;     ///< Shader permutation compiled binary data.
     std::shared_ptr<IReflectionData>    reflectionData = nullptr;   ///< Shader permutation <c><i>IReflectionData</i></c> data.
 

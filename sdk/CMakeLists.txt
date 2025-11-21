@@ -169,6 +169,7 @@ add_compile_definitions(UNICODE)
 add_compile_definitions(_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
 add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+message(STATUS "fidelirtyfx: CMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY}")
 
 if(FFX_VS_VERSION STREQUAL 2015 OR FFX_VS_VERSION STREQUAL 2017)
     message(NOTICE "Forcing the SDK path for VS 2015 and VS 2017")

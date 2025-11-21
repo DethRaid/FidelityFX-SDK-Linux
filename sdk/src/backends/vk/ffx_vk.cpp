@@ -20,12 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <FidelityFX/host/backends/vk/ffx_vk.h>
+#include <FidelityFX/host/ffx_assert.h>
 #include <FidelityFX/host/ffx_interface.h>
 #include <FidelityFX/host/ffx_util.h>
-#include <FidelityFX/host/ffx_assert.h>
-#include <FidelityFX/host/backends/vk/ffx_vk.h>
-#include <ffx_shader_blobs.h>
 #include <ffx_breadcrumbs_list.h>
+#include <ffx_shader_blobs.h>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -3648,6 +3649,11 @@ FfxErrorCode CreatePipelineVK(FfxInterface* backendInterface,
     VkPipeline computePipeline = VK_NULL_HANDLE;
     if (backendContext->vkFunctionTable.vkCreateComputePipelines(backendContext->device, nullptr, 1, &pipelineCreateInfo, nullptr, &computePipeline) != VK_SUCCESS) {
         return FFX_ERROR_BACKEND_API_ERROR;
+    }
+    if (pipelineDescription->name[0] != 0) {
+        std::vector<char> realName(64);
+        ConvertUTF16ToUTF8(pipelineDescription->name, realName.data(), realName.size());
+        setVKObjectName(backendContext->vkFunctionTable, backendContext->device, VK_OBJECT_TYPE_PIPELINE, reinterpret_cast<uint64_t>(computePipeline), realName.data());
     }
 
     // done with shader module, so clean up

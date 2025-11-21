@@ -27,6 +27,8 @@
 // UAV  2 : SPD_InputDownsampleSrcMips      : rw_input_downsample_src_mips
 // CB   0 : cbSPD
 
+// i've added a new define, FFX_SPD_ARRAY_TEXTURE. if defined, the code will be able to downsample an array texture. is it not defined.
+
 #version 450
 
 #extension GL_GOOGLE_include_directive : require

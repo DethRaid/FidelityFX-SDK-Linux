@@ -31,7 +31,7 @@ if(MSVC)
 endif()
 
 # General language options (require language standards specified)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -133,12 +133,11 @@ if(WIN32)
     add_subdirectory(libs/agilitysdk)
     add_subdirectory(libs/dxc)
 endif()
-add_subdirectory(libs/glslangValidator)
 add_subdirectory(libs/tiny-process-library)
 add_subdirectory(libs/utfcpp)
 
 # Add link time dependencies
-target_link_libraries (${PROJECT_NAME} glslangValidator utf8cpp tiny-process-library)
+target_link_libraries (${PROJECT_NAME} utf8cpp tiny-process-library)
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} dxguid agilitysdk dxc)
 endif()

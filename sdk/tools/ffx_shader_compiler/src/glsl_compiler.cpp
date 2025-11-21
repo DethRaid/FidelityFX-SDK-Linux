@@ -92,7 +92,7 @@ GLSLCompiler::~GLSLCompiler()
 
 static bool FindIncludeFilePath(const std::string& includeFile, const std::vector<fs::path>& includeSearchPaths, fs::path& includeFilePath)
 {
-    fs::path localPath = includeFile;
+    const fs::path localPath = includeFile;
     if (fs::exists(localPath))
     {
         includeFilePath = fs::absolute(localPath);
@@ -165,7 +165,7 @@ static void CollectDependencies(const std::string& shaderPath, const std::vector
 
 bool GLSLCompiler::GLSLCompiler::Compile(Permutation& permutation, const std::vector<std::string>& arguments, std::mutex& writeMutex)
 {
-    GLSLShaderBinary* glslShaderBinary = new GLSLShaderBinary();
+    auto glslShaderBinary = new GLSLShaderBinary();
 
     permutation.shaderBinary = std::shared_ptr<GLSLShaderBinary>(glslShaderBinary);
 
@@ -246,10 +246,10 @@ bool GLSLCompiler::GLSLCompiler::Compile(Permutation& permutation, const std::ve
                 }
                 if (token.rfind(m_ShaderPath, 0) == 0)
                 {
-                    size_t begin = m_ShaderPath.size() + 1;
+                    const size_t begin = m_ShaderPath.size() + 1;
                     if (token[begin - 1u] == ':')
                     {
-                        size_t end = token.find(':', begin);
+                        const size_t end = token.find(':', begin);
 
                         std::string lineNumberString(token.begin() + begin, token.begin() + end);
                         lineNumber = std::stoi(lineNumberString);
@@ -276,7 +276,7 @@ bool GLSLCompiler::GLSLCompiler::Compile(Permutation& permutation, const std::ve
     {
         writeMutex.lock();
 
-        fprintf(stderr, "%s[%lu]\n", m_ShaderFileName.c_str(), permutation.key);
+        fprintf(stderr, "%s[%u]\n", m_ShaderFileName.c_str(), permutation.key);
 
         for (size_t i = 1; i < errors.size(); i++)
         {
@@ -328,8 +328,8 @@ bool GLSLCompiler::GLSLCompiler::Compile(Permutation& permutation, const std::ve
 
 bool GLSLCompiler::ExtractReflectionData(Permutation& permutation)
 {
-    GLSLShaderBinary*   glslShaderBinary   = dynamic_cast<GLSLShaderBinary*>(permutation.shaderBinary.get());
-    IReflectionData* glslReflectionData = new IReflectionData();
+    auto glslShaderBinary   = dynamic_cast<GLSLShaderBinary*>(permutation.shaderBinary.get());
+    auto glslReflectionData = new IReflectionData();
 
     permutation.reflectionData = std::shared_ptr<IReflectionData>(glslReflectionData);
 
@@ -348,11 +348,11 @@ bool GLSLCompiler::ExtractReflectionData(Permutation& permutation)
 
     for (int setIdx = 0; setIdx < sets.size(); setIdx++)
     {
-        SpvReflectDescriptorSet* ds = sets[setIdx];
+        const SpvReflectDescriptorSet* ds = sets[setIdx];
 
         for (int bindingIdx = 0; bindingIdx < ds->binding_count; bindingIdx++)
         {
-            SpvReflectDescriptorBinding* binding = ds->bindings[bindingIdx];
+            const SpvReflectDescriptorBinding* binding = ds->bindings[bindingIdx];
             ShaderResourceInfo resourceInfo = {binding->name ? binding->name : "", binding->binding, binding->count, ds->set};
 
             switch (binding->descriptor_type)
@@ -399,7 +399,7 @@ bool GLSLCompiler::ExtractReflectionData(Permutation& permutation)
 
 void GLSLCompiler::WriteBinaryHeaderReflectionData(FILE* fp, const Permutation& permutation, std::mutex& writeMutex)
 {
-    IReflectionData* glslReflectionData = dynamic_cast<IReflectionData*>(permutation.reflectionData.get());
+    const IReflectionData* glslReflectionData = dynamic_cast<IReflectionData*>(permutation.reflectionData.get());
 
     const auto WriteResourceInfo =
         [](FILE* fp, const std::string& permutationName, const std::vector<ShaderResourceInfo>& resourceInfo, const std::string& resourceTypeString) {
@@ -521,7 +521,7 @@ void GLSLCompiler::WritePermutationHeaderReflectionStructMembers(FILE* fp)
 
 void GLSLCompiler::WritePermutationHeaderReflectionData(FILE* fp, const Permutation& permutation)
 {
-    IReflectionData* glslReflectionData = dynamic_cast<IReflectionData*>(permutation.reflectionData.get());
+    const IReflectionData* glslReflectionData = dynamic_cast<IReflectionData*>(permutation.reflectionData.get());
 
     const auto WriteResourceInfo = [](FILE* fp, const int& numResources, const std::string& permutationName, const std::string& resourceTypeString) {
         if (numResources == 0)

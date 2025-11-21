@@ -342,7 +342,7 @@ int CalculateDXBCChecksum(unsigned char* pData, unsigned long dwSize, unsigned l
     unsigned long dwNumberOfBits = dwSize * 8;
 
     // First we hash all the full chunks available
-    unsigned long dwFullChunksSize = dwSize & 0xffffffc0;
+    const unsigned long dwFullChunksSize = dwSize & 0xffffffc0;
     MD5Update(&md5Ctx, pData, dwFullChunksSize);
 
     unsigned long dwLastChunkSize = dwSize - dwFullChunksSize;

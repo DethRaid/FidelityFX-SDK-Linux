@@ -42,7 +42,7 @@ void ffxSetPrintMessageCallback(ffxMessageCallback callback, uint32_t debugLevel
     return;
 }
 
-void ffxPrintMessage(uint32_t type, const wchar_t* message)
+void ffxPrintMessage(uint32_t type, const char* message)
 {
     if (!s_messageCallback) {
 #ifdef _WIN32
@@ -57,9 +57,11 @@ void ffxPrintMessage(uint32_t type, const wchar_t* message)
         OutputDebugStringW(buffer);
 #else
         if(type == FFX_MESSAGE_TYPE_ERROR) {
-            fprintf(stderr, "FSR_API_DEBUG_ERROR: %ls\n", message);
+            fprintf(stderr, "FSR_API_DEBUG_ERROR: %s\n", message);
         } else if(type == FFX_MESSAGE_TYPE_WARNING) {
-            fprintf(stderr, "FSR_API_DEBUG_WARNING: %ls\n", message);
+            fprintf(stderr, "FSR_API_DEBUG_WARNING: %s\n", message);
+        } else if(type == FFX_MESSAGE_TYPE_DEBUG) {
+            fprintf(stdout, "FSR_API_DEBUG: %s\n", message);
         }
 #endif
     } else {

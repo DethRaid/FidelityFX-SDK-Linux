@@ -37,6 +37,7 @@
 #include <array>
 #include <cmath>
 #include <cstring>
+#include <format>
 #include <locale>
 #include <vulkan/vulkan.h>
 
@@ -2524,6 +2525,7 @@ FfxErrorCode DestroyResourceVK(FfxInterface* backendInterface, FfxResourceIntern
             if (backgroundResource.bufferResource != VK_NULL_HANDLE)
             {
                 backendContext->vkFunctionTable.vkDestroyBuffer(backendContext->device, backgroundResource.bufferResource, nullptr);
+
                 backgroundResource.bufferResource = VK_NULL_HANDLE;
             }
         }

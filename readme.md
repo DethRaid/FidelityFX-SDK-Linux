@@ -85,6 +85,10 @@ Linux support has been added by DethRaid (me). I've made the following changes t
 <li>>I added an include for `math.h` in `ffx_core_cpu.h`</li>
 <li>>Added some explicit casts to `uint32_t`</li>
 <li>>I have made so many changes to the shader compilation. yalls have no idea (i guess you can get an idea by checking the git history). I've added excape characters to the shader permutations to get around bash command expansion, I've fixed up the cmake files so they don't create dummy targets that don't exist and also don't double-add shaders, I've rewritten a lot of the shader compiler program to not be married to windows, like at all. At least half my time on this project has been spent just reworking shader compilation</li>
+<li>the shader compiler uses less std::wstring, one day it will use none</li>
+<li>shader permutations are now specified without curly braces! this means the shader compiler can work on `sh` and friends</li>
+<li>removing std::wstring from the main ffx...</li>
+<li>added a FFX_MESSAGE_TYPE_DEBUG for my own usage</li>
 </ul>
 
 <h2>Open source</h2>

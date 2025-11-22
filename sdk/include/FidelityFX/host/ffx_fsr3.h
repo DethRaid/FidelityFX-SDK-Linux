@@ -168,9 +168,9 @@ typedef struct FfxFsr3ContextDescription {
     FfxDimensions2D             maxRenderSize;                      ///< The maximum size that rendering will be performed at.
     FfxDimensions2D             maxUpscaleSize;                  ///< The size of the presentation resolution targeted by the upscaling process.
     FfxDimensions2D             displaySize;                        ///< The size of the presentation resolution targeted by the frame interpolation process.
-    FfxInterface                backendInterfaceSharedResources;    ///< A set of pointers to the backend implementation for FidelityFX SDK
-    FfxInterface                backendInterfaceUpscaling;          ///< A set of pointers to the backend implementation for FidelityFX SDK
-    FfxInterface                backendInterfaceFrameInterpolation; ///< A set of pointers to the backend implementation for FidelityFX SDK
+    FfxInterface                backendInterfaceSharedResources;    ///< A set of pointers to the backend implementation for FidelityFX SDK. used to create resources that are shared between the fsr3 upscaler and frame interpolator. MUST be a separate instance
+    FfxInterface                backendInterfaceUpscaling;          ///< A set of pointers to the backend implementation for FidelityFX SDK. used to create resources that are specific to the fsr3 upscaler. MUST be a separate instance
+    FfxInterface                backendInterfaceFrameInterpolation; ///< A set of pointers to the backend implementation for FidelityFX SDK. used to create resources that are specific to the fsr3 frame interpolation. MUST be a separate instance
     FfxFsr3UpscalerMessage      fpMessage;                          ///< A pointer to a function that can receive messages from the runtime.
     FfxSurfaceFormat            backBufferFormat;                   ///< The format of the swapchain surface
 

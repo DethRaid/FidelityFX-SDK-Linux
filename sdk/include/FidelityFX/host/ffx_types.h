@@ -510,7 +510,7 @@ typedef enum FfxBarrierType
     FFX_BARRIER_TYPE_UAV,
 } FfxBarrierType;
 
-typedef void (*ffxMessageCallback)(uint32_t type, const wchar_t* message);
+typedef void (*ffxMessageCallback)(uint32_t type, const char* message);
 
 /// An enumeration for message types that can be passed
 ///
@@ -518,6 +518,7 @@ typedef void (*ffxMessageCallback)(uint32_t type, const wchar_t* message);
 typedef enum FfxMsgType {
     FFX_MESSAGE_TYPE_ERROR      = 0,
     FFX_MESSAGE_TYPE_WARNING    = 1,
+    FFX_MESSAGE_TYPE_DEBUG      = 2,
     FFX_MESSAGE_TYPE_COUNT
 } FfxMsgType;
 

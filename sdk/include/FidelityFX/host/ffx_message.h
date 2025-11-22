@@ -46,7 +46,7 @@ FFX_API void ffxSetPrintMessageCallback(ffxMessageCallback callback, uint32_t de
 /// @param [in] message                 The message to print.
 ///
 /// @ingroup Messages
-FFX_API void ffxPrintMessage(uint32_t type, const wchar_t* message);
+FFX_API void ffxPrintMessage(uint32_t type, const char* message);
 
 /// Macro to print message
 /// by calling application registered callback,

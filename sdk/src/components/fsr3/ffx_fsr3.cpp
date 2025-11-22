@@ -32,10 +32,11 @@
 #pragma clang diagnostic ignored "-Wsign-compare"
 #endif
 
-#include <cwchar>
 #include <FidelityFX/gpu/ffx_core.h>
 #include <FidelityFX/gpu/fsr3/ffx_fsr3_resources.h>
+#include <cwchar>
 #include <ffx_object_management.h>
+#include <format>
 #if defined(FFX_FI)
 #include "../frameinterpolation/ffx_frameinterpolation_private.h"
 #endif
@@ -100,7 +101,7 @@ FfxErrorCode ffxFsr3ContextCreate(FfxFsr3Context* context, FfxFsr3ContextDescrip
     }
     else
     {
-        const FfxUInt32 numBackendsToVerify = contextPrivate->upscalingOnly ? 1 : 3;
+        const FfxUInt32 numBackendsToVerify = contextPrivate->upscalingOnly ? 2 : 3;
         FfxInterface* backendsToVerify[] = { &contextPrivate->backendInterfaceUpscaling,
                                                &contextPrivate->backendInterfaceSharedResources,
                                                &contextPrivate->backendInterfaceFrameInterpolation };
@@ -122,18 +123,11 @@ FfxErrorCode ffxFsr3ContextCreate(FfxFsr3Context* context, FfxFsr3ContextDescrip
         }
     }
 
-    if (!contextPrivate->upscalingOnly)
-    {
-        FFX_VALIDATE(contextPrivate->backendInterfaceSharedResources.fpCreateBackendContext(&contextPrivate->backendInterfaceSharedResources,
-            FFX_EFFECT_SHAREDRESOURCES,
-            nullptr,
-            &contextPrivate->effectContextIdSharedResources));
-    }
-    else
-    {
-        contextPrivate->backendInterfaceSharedResources = contextPrivate->backendInterfaceUpscaling;
-        contextDescription->backendInterfaceSharedResources = contextDescription->backendInterfaceUpscaling;
-    }
+    FFX_VALIDATE(contextPrivate->backendInterfaceSharedResources.fpCreateBackendContext(&contextPrivate->backendInterfaceSharedResources,
+        FFX_EFFECT_SHAREDRESOURCES,
+        nullptr,
+        &contextPrivate->effectContextIdSharedResources));
+
 
     // set up FSR3 Upscaler
     // ensure we're actually creating an FSR3 Upscaler context, not the creationfunction that reroutes to ffxFsr3ContextCreate

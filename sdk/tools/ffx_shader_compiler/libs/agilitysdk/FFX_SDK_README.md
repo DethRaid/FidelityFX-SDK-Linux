@@ -1,7 +1,7 @@
 # DX12 Agility SDK
 
 ## Current Version
-1.614.1
+1.618.3
 
 ## How to update
 - Download the latest version (as a .nupkg) from https://devblogs.microsoft.com/directx/directx12agility/

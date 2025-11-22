@@ -513,20 +513,20 @@ void Application::OpenSourceFile() {
 #ifdef _WIN32
         if (m_Params.compiler == "dxc") {
             m_Compiler = std::make_unique<HLSLCompiler>(
-                new HLSLCompiler(HLSLCompiler::DXC, dxcDll, shaderPath, shaderName, shaderFileName, outputPath,
-                                 m_Params.disableLogs, m_Params.debugCompile));
+                HLSLCompiler::DXC, dxcDll, shaderPath, shaderName, shaderFileName, outputPath,
+                                 m_Params.disableLogs, m_Params.debugCompile);
         } else if (m_Params.compiler == "gdk.scarlett.x64") {
-            m_Compiler = std::make_unique<HLSLCompiler>(new HLSLCompiler(
+            m_Compiler = std::make_unique<HLSLCompiler>(
                 HLSLCompiler::GDK_SCARLETT_X64, dxcDll, shaderPath, shaderName, shaderFileName, outputPath,
-                m_Params.disableLogs, m_Params.debugCompile));
+                m_Params.disableLogs, m_Params.debugCompile);
         } else if (m_Params.compiler == "gdk.xboxone.x64") {
-            m_Compiler = std::make_unique<HLSLCompiler>(new HLSLCompiler(
+            m_Compiler = std::make_unique<HLSLCompiler>(
                 HLSLCompiler::GDK_XBOXONE_X64, dxcDll, shaderPath, shaderName, shaderFileName, outputPath,
-                m_Params.disableLogs, m_Params.debugCompile));
+                m_Params.disableLogs, m_Params.debugCompile);
         } else if (m_Params.compiler == "fxc") {
             m_Compiler = std::make_unique<HLSLCompiler>(
-                new HLSLCompiler(HLSLCompiler::FXC, d3dDll, shaderPath, shaderName, shaderFileName, outputPath,
-                                 m_Params.disableLogs, m_Params.debugCompile));
+                HLSLCompiler::FXC, d3dDll, shaderPath, shaderName, shaderFileName, outputPath,
+                                 m_Params.disableLogs, m_Params.debugCompile);
         } else
 #endif
         if (m_Params.compiler == "glslang") {
@@ -993,7 +993,7 @@ void Application::DumpDepfileMSVC() {
     printf("MSVC depfile not implemented yet.\n");
 }
 
-int wmain(const int argc, char **argv) {
+int main(const int argc, char **argv) {
     try {
         if (argc <= 1) {
             LaunchParameters::PrintCommandLineSyntax();
@@ -1016,23 +1016,3 @@ int wmain(const int argc, char **argv) {
         return -1;
     }
 }
-
-#ifndef _WIN32
-int main(const int argc, char **argv) {
-    auto argument_vector = std::vector<std::string>{};
-    argument_vector.reserve(argc);
-
-    for (int i = 0; i < argc; i++) {
-        argument_vector.emplace_back(argv[i]);
-    }
-
-    auto pointed_argument_vector = std::vector<char *>{};
-    pointed_argument_vector.reserve(argument_vector.size());
-    pointed_argument_vector.reserve(argc);
-    for (auto &wstr: argument_vector) {
-        pointed_argument_vector.emplace_back(wstr.data());
-    }
-
-    return wmain(argc, pointed_argument_vector.data());
-}
-#endif

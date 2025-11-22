@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 
 #include "utils.h"
-#include "utf8.h"
+#include <utf8.h>
 
 std::string WCharToUTF8(const std::wstring& wstr)
 {
@@ -32,8 +32,8 @@ std::string WCharToUTF8(const std::wstring& wstr)
     // i have wasted so much of my one human life dealing with this
     // i could be kissing girls but nooooooooo
     if constexpr (sizeof(wchar_t) == sizeof(char16_t)) {
-
         return utf8::utf16to8(std::u16string_view{reinterpret_cast<const char16_t*>(wstr.c_str()), wstr.size()});
+
     } else if constexpr (sizeof(wchar_t) == sizeof(char32_t)) {
         return utf8::utf32to8(std::u32string_view{reinterpret_cast<const char32_t*>(wstr.c_str()), wstr.size()});
 

@@ -26,8 +26,8 @@
 #ifdef _WIN32
 
 // D3D12SDKVersion needs to line up with the version number on Microsoft's DirectX12 Agility SDK Download page
-extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 614; }
-extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = u8".\\D3D12\\"; }
+extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 618; }
+extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = ".\\D3D12\\"; }
 
 struct DxcCustomIncludeHandler : public IDxcIncludeHandler
 {

@@ -40,7 +40,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 if (MSVC)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W3")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W3 /Zc:__cplusplus")
 endif()
 
 if (CMAKE_GENERATOR_PLATFORM STREQUAL x64 OR

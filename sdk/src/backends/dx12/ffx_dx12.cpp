@@ -142,7 +142,7 @@ typedef struct BackendContext_DX12 {
 
     IDXGIFactory*           dxgiFactory = nullptr;
 
-    typedef struct alignas(32) EffectContext {
+    typedef struct EffectContext {
 
         // Effect identifier -- used for various resource callbacks to application
         FfxEffect           effectId;

@@ -59,38 +59,38 @@ static wchar_t* getKernelSizeString(wchar_t* buffer, FfxBlurKernelSize kernelSiz
     switch (kernelSize)
     {
     case FFX_BLUR_KERNEL_SIZE_3x3:
-        wcsncpy(buffer, L"3x3", wcslen(L"3x3"));
+        wcscpy(buffer, L"3x3");
         break;
     case FFX_BLUR_KERNEL_SIZE_5x5:
-        wcsncpy(buffer, L"5x5", wcslen(L"5x5"));
+        wcscpy(buffer, L"5x5");
         break;
     case FFX_BLUR_KERNEL_SIZE_7x7:
-        wcsncpy(buffer, L"7x7", wcslen(L"7x7"));
+        wcscpy(buffer, L"7x7");
         break;
     case FFX_BLUR_KERNEL_SIZE_9x9:
-        wcsncpy(buffer, L"9x9", wcslen(L"9x9"));
+        wcscpy(buffer, L"9x9");
         break;
     case FFX_BLUR_KERNEL_SIZE_11x11:
-        wcsncpy(buffer, L"11x11", wcslen(L"11x11"));
+        wcscpy(buffer, L"11x11");
         break;
     case FFX_BLUR_KERNEL_SIZE_13x13:
-        wcsncpy(buffer, L"13x13", wcslen(L"13x13"));
+        wcscpy(buffer, L"13x13");
         break;
     case FFX_BLUR_KERNEL_SIZE_15x15:
-        wcsncpy(buffer, L"15x15", wcslen(L"15x15"));
+        wcscpy(buffer, L"15x15");
         break;
     case FFX_BLUR_KERNEL_SIZE_17x17:
-        wcsncpy(buffer, L"17x17", wcslen(L"17x17"));
+        wcscpy(buffer, L"17x17");
         break;
     case FFX_BLUR_KERNEL_SIZE_19x19:
-        wcsncpy(buffer, L"19x19", wcslen(L"19x19"));
+        wcscpy(buffer, L"19x19");
         break;
     case FFX_BLUR_KERNEL_SIZE_21x21:
-        wcsncpy(buffer, L"21x21", wcslen(L"21x21"));
+        wcscpy(buffer, L"21x21");
         break;
     default:
         FFX_ASSERT_MESSAGE(false, "Unhandled kernel size in getKernelSizeString.");
-        wcsncpy(buffer, L"?x?", wcslen(L"?x?"));
+        wcscpy(buffer, L"?x?");
         break;
     }
 #pragma warning(pop)

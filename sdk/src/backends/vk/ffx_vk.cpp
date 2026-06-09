@@ -206,7 +206,7 @@ typedef struct BackendContext_VK {
     VkPipelineStageFlags    srcStageMask = 0;
     VkPipelineStageFlags    dstStageMask = 0;
 
-    typedef struct alignas(32) EffectContext {
+    typedef struct EffectContext {
 
         // Effect identifier -- used for various resource callbacks to application
         FfxEffect           effectId;
